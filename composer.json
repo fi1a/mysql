@@ -1,5 +1,5 @@
 {
-  "name": "fi1a/package-template",
+  "name": "fi1a/mysql",
   "type": "library",
   "description": "Расширение базы данных MySQL",
   "keywords": [],
