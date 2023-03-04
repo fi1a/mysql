@@ -8,6 +8,7 @@ use Fi1a\DB\Adapters\AbstractSqlAdapter;
 use Fi1a\DB\Adapters\HandlerInterface;
 use Fi1a\DB\Exceptions\QueryErrorException;
 use Fi1a\MySql\Handlers\CreateTableHandler;
+use Fi1a\MySql\Handlers\DropTableHandler;
 use PDO;
 
 /**
@@ -55,6 +56,8 @@ class MySqlAdapter extends AbstractSqlAdapter
         switch ($type) {
             case 'createTable':
                 return new CreateTableHandler();
+            case 'dropTable':
+                return new DropTableHandler();
         }
 
         throw new QueryErrorException(sprintf('Неизвестный запрос %s', $type));

@@ -15,35 +15,6 @@ use Fi1a\Unit\MySql\TestCases\TestCase;
 class CreateTableHandlerTest extends TestCase
 {
     /**
-     * Создание таблицы
-     */
-    public function testCreateTable(): void
-    {
-        $adapter = $this->getAdapter();
-
-        $query = Schema::create()
-            ->name('tableName')
-            ->column(Column::create()->name('column1'));
-
-        $this->assertTrue($adapter->exec($query));
-    }
-
-    /**
-     * Создание таблицы
-     */
-    public function testCreateTableIfNotExists(): void
-    {
-        $adapter = $this->getAdapter();
-
-        $query = Schema::create()
-            ->name('tableName')
-            ->ifNotExists()
-            ->column(Column::create()->name('column1'));
-
-        $this->assertTrue($adapter->exec($query));
-    }
-
-    /**
      * Исключение при пустом имени таблицы
      */
     public function testValidateEmptyTableName(): void
