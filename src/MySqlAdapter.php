@@ -10,6 +10,7 @@ use Fi1a\DB\Exceptions\QueryErrorException;
 use Fi1a\MySql\Handlers\CreateTableHandler;
 use Fi1a\MySql\Handlers\DropTableHandler;
 use PDO;
+use PDOException;
 
 /**
  * Адаптер MySql
@@ -27,6 +28,7 @@ class MySqlAdapter extends AbstractSqlAdapter
     public function __construct(string $dsn, ?string $username = null, ?string $password = null, ?array $options = null)
     {
         $this->connection = new PDO($dsn, $username, $password, $options);
+        $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
     /**
@@ -34,7 +36,13 @@ class MySqlAdapter extends AbstractSqlAdapter
      */
     public function execSql(string $sql)
     {
-        return $this->connection->exec($sql);
+        try {
+            $result = $this->connection->exec($sql);
+        } catch (PDOException $exception) {
+            throw new QueryErrorException($exception->getMessage(), (int) $exception->getCode(), $exception);
+        }
+
+        return $result;
     }
 
     /**
@@ -42,10 +50,26 @@ class MySqlAdapter extends AbstractSqlAdapter
      */
     public function querySql(string $sql): array
     {
-        /** @var array<array-key, array<string, string>>|false $items */
-        $items = $this->connection->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        $items = false;
+        try {
+            $statement = $this->connection->query($sql);
+            if ($statement) {
+                /** @var array<array-key, array<string, string>>|false $items */
+                $items = $statement->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } catch (PDOException $exception) {
+            throw new QueryErrorException($exception->getMessage(), (int) $exception->getCode(), $exception);
+        }
 
         return $items === false ? [] : $items;
+    }
+
+    /**
+     * Возвращает соединение
+     */
+    public function getConnection(): PDO
+    {
+        return $this->connection;
     }
 
     /**
@@ -55,9 +79,9 @@ class MySqlAdapter extends AbstractSqlAdapter
     {
         switch ($type) {
             case 'createTable':
-                return new CreateTableHandler();
+                return new CreateTableHandler($this->connection);
             case 'dropTable':
-                return new DropTableHandler();
+                return new DropTableHandler($this->connection);
         }
 
         throw new QueryErrorException(sprintf('Неизвестный запрос %s', $type));

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Fi1a\MySql\Handlers;
 
-use Fi1a\DB\Adapters\HandlerInterface;
 use Fi1a\DB\Exceptions\QueryErrorException;
 use Fi1a\Validation\Error;
 use Fi1a\Validation\Validator;
@@ -12,7 +11,7 @@ use Fi1a\Validation\Validator;
 /**
  * Обработчик удаления таблицы
  */
-class DropTableHandler implements HandlerInterface
+class DropTableHandler extends AbstractMySqlHandler
 {
     /**
      * @inheritDoc
