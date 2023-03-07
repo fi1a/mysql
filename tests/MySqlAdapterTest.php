@@ -25,7 +25,7 @@ class MySqlAdapterTest extends TestCase
     }
 
     /**
-     * Создание таблицы
+     * Создание таблицы с типом integer
      */
     public function testCreateTable(): void
     {
@@ -33,7 +33,11 @@ class MySqlAdapterTest extends TestCase
 
         $query = Schema::create()
             ->name('tableName')
-            ->column(Column::create()->name('column1'));
+            ->column(
+                Column::create()
+                    ->name('integer')
+                    ->integer()
+            );
 
         $this->assertTrue($adapter->exec($query));
     }
@@ -50,7 +54,7 @@ class MySqlAdapterTest extends TestCase
         $query = Schema::create()
             ->name('tableName')
             ->ifNotExists()
-            ->column(Column::create()->name('column1'));
+            ->column(Column::create()->name('integer'));
 
         $this->assertTrue($adapter->exec($query));
     }
@@ -84,5 +88,19 @@ class MySqlAdapterTest extends TestCase
             ->name('tableName');
 
         $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Исключение при ошибке в запросе
+     */
+    public function testExecException(): void
+    {
+        $this->expectException(QueryErrorException::class);
+        $adapter = $this->getAdapter();
+
+        $query = Schema::drop()
+            ->name('tableName');
+
+        $adapter->exec($query);
     }
 }

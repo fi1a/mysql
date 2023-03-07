@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Fi1a\MySql\Handlers;
 
-use Fi1a\DB\Adapters\HandlerInterface;
 use Fi1a\DB\Exceptions\QueryErrorException;
+use Fi1a\MySql\Facades\Registry;
 use Fi1a\Validation\Error;
 use Fi1a\Validation\Validator;
 
 /**
  * Обработчик создания таблицы
  */
-class CreateTableHandler implements HandlerInterface
+class CreateTableHandler extends AbstractMySqlHandler
 {
     /**
      * @inheritDoc
@@ -29,6 +29,7 @@ class CreateTableHandler implements HandlerInterface
                 'columns' => 'array|required',
                 'columns:*:columnName' => 'required',
                 'columns:*:type' => 'required',
+                'columns:*:nullable' => 'boolean',
             ]
         );
 
@@ -59,11 +60,15 @@ class CreateTableHandler implements HandlerInterface
         $sql .= $query['tableName'] . ' (';
 
         foreach ($query['columns'] as $index => $column) {
-            $sql .= ($index > 0 ? ', ' : '') . $column['columnName'] . ' ' . $column['type'];
+            $params = isset($column['params']) ? (array) $column['params'] : null;
+            $type = Registry::get((string) $column['type'], $this->connection, (string) $column['columnName'], $params);
+            $sql .= ($index > 0 ? ', ' : '') . '`' . $column['columnName'] . '` ' . $type->getSql();
+            $sql .= ' ' . ($column['nullable'] ? 'NULL' : 'NOT NULL');
+            if (isset($column['default'])) {
+                $sql .= ' DEFAULT ' . $type->conversionTo($column['default']);
+            }
         }
 
-        $sql .= ');';
-
-        return $sql;
+        return $sql . ');';
     }
 }
