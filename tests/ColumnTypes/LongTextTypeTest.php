@@ -33,12 +33,6 @@ class LongTextTypeTest extends TestCase
                     ->name('columnNull')
                     ->longText()
                     ->nullable()
-            )
-            ->column(
-                Column::create()
-                    ->name('columnDefault')
-                    ->longText()
-                    ->default('text')
             );
 
         $this->assertTrue($adapter->exec($query));

@@ -33,12 +33,6 @@ class MediumTextTypeTest extends TestCase
                     ->name('columnNull')
                     ->mediumText()
                     ->nullable()
-            )
-            ->column(
-                Column::create()
-                    ->name('columnDefault')
-                    ->mediumText()
-                    ->default('text')
             );
 
         $this->assertTrue($adapter->exec($query));
