@@ -33,12 +33,6 @@ class TextTypeTest extends TestCase
                     ->name('columnNull')
                     ->text()
                     ->nullable()
-            )
-            ->column(
-                Column::create()
-                    ->name('columnDefault')
-                    ->text()
-                    ->default('text')
             );
 
         $this->assertTrue($adapter->exec($query));

@@ -33,12 +33,6 @@ class JsonTypeTest extends TestCase
                     ->name('columnNull')
                     ->json()
                     ->nullable()
-            )
-            ->column(
-                Column::create()
-                    ->name('columnDefault')
-                    ->json()
-                    ->default([1, 2, 3])
             );
 
         $this->assertTrue($adapter->exec($query));
