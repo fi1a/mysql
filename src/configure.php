@@ -26,7 +26,7 @@ use Fi1a\MySql\ColumnTypes\TextType;
 use Fi1a\MySql\ColumnTypes\TimeType;
 use Fi1a\MySql\ColumnTypes\TimestampType;
 use Fi1a\MySql\ColumnTypes\TinyIntegerType;
-use Fi1a\MySql\Facades\Registry as RegistryFacade;
+use Fi1a\MySql\Facades\ColumnTypeRegistry;
 
 di()->config()->addDefinition(
     Builder::build(RegistryInterface::class)
@@ -44,24 +44,24 @@ di()->config()->addDefinition(
         ->getDefinition()
 );
 
-RegistryFacade::add('integer', IntegerType::class);
-RegistryFacade::add('bigInteger', BigIntegerType::class);
-RegistryFacade::add('tinyInteger', TinyIntegerType::class);
-RegistryFacade::add('smallInteger', SmallIntegerType::class);
-RegistryFacade::add('mediumInteger', MediumIntegerType::class);
-RegistryFacade::add('timestamp', TimestampType::class);
-RegistryFacade::add('char', CharType::class);
-RegistryFacade::add('string', StringType::class);
-RegistryFacade::add('text', TextType::class);
-RegistryFacade::add('mediumText', MediumTextType::class);
-RegistryFacade::add('longText', LongTextType::class);
-RegistryFacade::add('time', TimeType::class);
-RegistryFacade::add('dateTime', DateTimeType::class);
-RegistryFacade::add('date', DateType::class);
-RegistryFacade::add('decimal', DecimalType::class);
-RegistryFacade::add('double', DoubleType::class);
-RegistryFacade::add('float', FloatType::class);
-RegistryFacade::add('binary', BinaryType::class);
-RegistryFacade::add('boolean', BooleanType::class);
-RegistryFacade::add('json', JsonType::class);
-RegistryFacade::add('enum', EnumType::class);
+ColumnTypeRegistry::add('integer', IntegerType::class);
+ColumnTypeRegistry::add('bigInteger', BigIntegerType::class);
+ColumnTypeRegistry::add('tinyInteger', TinyIntegerType::class);
+ColumnTypeRegistry::add('smallInteger', SmallIntegerType::class);
+ColumnTypeRegistry::add('mediumInteger', MediumIntegerType::class);
+ColumnTypeRegistry::add('timestamp', TimestampType::class);
+ColumnTypeRegistry::add('char', CharType::class);
+ColumnTypeRegistry::add('string', StringType::class);
+ColumnTypeRegistry::add('text', TextType::class);
+ColumnTypeRegistry::add('mediumText', MediumTextType::class);
+ColumnTypeRegistry::add('longText', LongTextType::class);
+ColumnTypeRegistry::add('time', TimeType::class);
+ColumnTypeRegistry::add('dateTime', DateTimeType::class);
+ColumnTypeRegistry::add('date', DateType::class);
+ColumnTypeRegistry::add('decimal', DecimalType::class);
+ColumnTypeRegistry::add('double', DoubleType::class);
+ColumnTypeRegistry::add('float', FloatType::class);
+ColumnTypeRegistry::add('binary', BinaryType::class);
+ColumnTypeRegistry::add('boolean', BooleanType::class);
+ColumnTypeRegistry::add('json', JsonType::class);
+ColumnTypeRegistry::add('enum', EnumType::class);

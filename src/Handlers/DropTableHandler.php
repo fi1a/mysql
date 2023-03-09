@@ -43,6 +43,7 @@ class DropTableHandler extends AbstractMySqlHandler
      * @psalm-suppress MixedOperand
      * @psalm-suppress MixedArrayAccess
      * @psalm-suppress MixedAssignment
+     * @psalm-suppress MixedArgument
      */
     public function prepare(array $query)
     {
@@ -52,7 +53,7 @@ class DropTableHandler extends AbstractMySqlHandler
             $sql .= 'IF EXISTS ';
         }
 
-        $sql .= $query['tableName'] . ';';
+        $sql .= $this->naming->wrapTableName($query['tableName']) . ';';
 
         return $sql;
     }
