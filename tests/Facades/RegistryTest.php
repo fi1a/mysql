@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\MySql\Facades;
 
-use Fi1a\MySql\Facades\Registry;
+use Fi1a\MySql\Facades\ColumnTypeRegistry;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,6 +17,6 @@ class RegistryTest extends TestCase
      */
     public function testFacade(): void
     {
-        $this->assertFalse(Registry::has('unknown'));
+        $this->assertFalse(ColumnTypeRegistry::has('unknown'));
     }
 }

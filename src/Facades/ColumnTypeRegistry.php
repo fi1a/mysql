@@ -16,7 +16,7 @@ use Fi1a\MySql\ColumnTypes\RegistryInterface;
  * @method static bool has(string $type)
  * @method static bool remove(string $type)
  */
-class Registry extends AbstractFacade
+class ColumnTypeRegistry extends AbstractFacade
 {
     /**
      * @inheritDoc

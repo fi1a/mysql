@@ -23,12 +23,23 @@ class MySqlAdapter extends AbstractSqlAdapter
     protected $connection;
 
     /**
+     * @var NamingInterface
+     */
+    protected $naming;
+
+    /**
      * @param array<string, mixed>|null $options
      */
-    public function __construct(string $dsn, ?string $username = null, ?string $password = null, ?array $options = null)
-    {
+    public function __construct(
+        string $dsn,
+        ?string $username = null,
+        ?string $password = null,
+        ?array $options = null,
+        ?string $tablePrefix = null
+    ) {
         $this->connection = new PDO($dsn, $username, $password, $options);
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->naming = new Naming($tablePrefix);
     }
 
     /**
@@ -79,9 +90,9 @@ class MySqlAdapter extends AbstractSqlAdapter
     {
         switch ($type) {
             case 'createTable':
-                return new CreateTableHandler($this->connection);
+                return new CreateTableHandler($this->connection, $this->naming);
             case 'dropTable':
-                return new DropTableHandler($this->connection);
+                return new DropTableHandler($this->connection, $this->naming);
         }
 
         throw new QueryErrorException(sprintf('Неизвестный запрос %s', $type));
