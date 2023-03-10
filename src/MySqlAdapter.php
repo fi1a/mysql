@@ -7,6 +7,7 @@ namespace Fi1a\MySql;
 use Fi1a\DB\Adapters\AbstractSqlAdapter;
 use Fi1a\DB\Adapters\HandlerInterface;
 use Fi1a\DB\Exceptions\QueryErrorException;
+use Fi1a\MySql\Handlers\AddIndexHandler;
 use Fi1a\MySql\Handlers\CreateTableHandler;
 use Fi1a\MySql\Handlers\DropTableHandler;
 use PDO;
@@ -93,6 +94,8 @@ class MySqlAdapter extends AbstractSqlAdapter
                 return new CreateTableHandler($this->connection, $this->naming);
             case 'dropTable':
                 return new DropTableHandler($this->connection, $this->naming);
+            case 'addIndex':
+                return new AddIndexHandler($this->connection, $this->naming);
         }
 
         throw new QueryErrorException(sprintf('Неизвестный запрос %s', $type));
