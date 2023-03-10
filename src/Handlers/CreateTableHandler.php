@@ -31,7 +31,9 @@ class CreateTableHandler extends AbstractMySqlHandler
             'columns:*:columnName' => 'string|required',
             'columns:*:type' => 'string|required',
             'columns:*:nullable' => 'boolean',
-            'columns:*:primary' => OneOf::create()->array()->null(),
+            'columns:*:primary' => OneOf::create()->generic([
+                'increments' => 'boolean',
+            ])->null(),
             'columns:*:unique' => OneOf::create()->generic([
                 'name' => 'string|required',
             ])->null(),
@@ -77,7 +79,7 @@ class CreateTableHandler extends AbstractMySqlHandler
 
         $sql .= $this->naming->wrapTableName($query['tableName']) . ' (';
 
-        $constraint = '';
+        $sqlPart = '';
 
         foreach ($query['columns'] as $index => $column) {
             $params = isset($column['params']) ? (array) $column['params'] : null;
@@ -95,36 +97,42 @@ class CreateTableHandler extends AbstractMySqlHandler
             }
             if (isset($column['primary']) && is_array($column['primary'])) {
                 $sql .= ' PRIMARY KEY';
-                if (isset($column['increments']) && $column['increments']) {
+                if (isset($column['primary']['increments']) && $column['primary']['increments']) {
                     $sql .= ' AUTO_INCREMENT';
                 }
             }
             if (isset($column['unique']) && is_array($column['unique'])) {
-                $constraint .= ($constraint ? ', ' : '')
+                $sqlPart .= ($sqlPart ? ', ' : '')
                     . 'UNIQUE KEY ' . $this->naming->wrapColumnName($column['unique']['name'])
                     . ' (' . $this->naming->wrapColumnName($column['columnName']) . ')';
             }
             if (isset($column['foreign']) && is_array($column['foreign'])) {
-                $constraint .= ($constraint ? ', ' : '')
+                $sqlPart .= ($sqlPart ? ', ' : '')
                     . 'FOREIGN KEY ' . $this->naming->wrapColumnName($column['foreign']['name']) . ' ('
                     . $this->naming->wrapColumnName($column['columnName']) . ') '
-                    . 'REFERENCES ' . $this->naming->wrapTableName($column['foreign']['on']) . ' '
-                    . '(' . $this->naming->wrapColumnName($column['foreign']['references']) . ')';
+                    . 'REFERENCES ' . $this->naming->wrapTableName($column['foreign']['on']) . ' ';
+
+                $columns = '';
+                foreach ($column['foreign']['references'] as $columnName) {
+                    $columns .= ($columns ? ', ' : '') . $this->naming->wrapColumnName($columnName);
+                }
+                $sqlPart .= ' (' . $columns . ')';
+
                 if (isset($column['foreign']['onDelete'])) {
-                    $constraint .= ' ON DELETE ' . $column['foreign']['onDelete'];
+                    $sqlPart .= ' ON DELETE ' . $column['foreign']['onDelete'];
                 }
                 if (isset($column['foreign']['onUpdate'])) {
-                    $constraint .= ' ON UPDATE ' . $column['foreign']['onUpdate'];
+                    $sqlPart .= ' ON UPDATE ' . $column['foreign']['onUpdate'];
                 }
             }
             if (isset($column['index']) && is_array($column['index'])) {
-                $constraint .= ($constraint ? ', ' : '')
+                $sqlPart .= ($sqlPart ? ', ' : '')
                     . 'INDEX ' . $this->naming->wrapColumnName($column['index']['name']) . ' ('
                     . $this->naming->wrapColumnName($column['columnName']) . ')';
             }
         }
-        if ($constraint) {
-            $sql .= ', ' . $constraint;
+        if ($sqlPart) {
+            $sql .= ', ' . $sqlPart;
         }
 
         return $sql . ');';

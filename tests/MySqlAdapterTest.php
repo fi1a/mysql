@@ -42,10 +42,110 @@ class MySqlAdapterTest extends TestCase
             );
 
         $this->assertTrue($adapter->exec($query));
+
+        $query = Schema::create()
+            ->name('tableNameAddIndex')
+            ->column(
+                Column::create()
+                    ->name('primary')
+                    ->integer()
+            )
+            ->column(
+                Column::create()
+                    ->name('index')
+                    ->integer()
+            )
+            ->column(
+                Column::create()
+                    ->name('unique')
+                    ->integer()
+            )
+            ->column(
+                Column::create()
+                    ->name('foreign')
+                    ->integer()
+            );
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Добавление первичного ключа
+     *
+     * @depends testCreateTable
+     */
+    public function testAddPrimaryIndex(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::addIndex()
+            ->primary()
+            ->column('primary')
+            ->table('tableNameAddIndex')
+            ->increments();
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Добавление индекса
+     *
+     * @depends testCreateTable
+     */
+    public function testAddIndex(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::addIndex()
+            ->index()
+            ->column('index')
+            ->table('tableNameAddIndex');
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Добавление уникального ключа
+     *
+     * @depends testCreateTable
+     */
+    public function testAddUniqueIndex(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::addIndex()
+            ->unique()
+            ->column('unique')
+            ->table('tableNameAddIndex');
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Добавление уникального ключа
+     *
+     * @depends testCreateTable
+     */
+    public function testAddForeignIndex(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::addIndex()
+            ->foreign()
+            ->column('foreign')
+            ->table('tableNameAddIndex')
+            ->on('tableNameForeign')
+            ->reference('id')
+            ->onDelete(ForeignIndexInterface::CASCADE)
+            ->onUpdate(ForeignIndexInterface::CASCADE);
+
+        $this->assertTrue($adapter->exec($query));
     }
 
     /**
      * Создание таблицы с типом integer
+     *
+     * @depends testCreateTable
      */
     public function testCreateTableWithIndex(): void
     {
@@ -58,7 +158,6 @@ class MySqlAdapterTest extends TestCase
                     ->name('primary')
                     ->integer()
                     ->primary()
-                    ->increments()
             )
             ->column(
                 Column::create()
@@ -115,6 +214,11 @@ class MySqlAdapterTest extends TestCase
 
         $query = Schema::drop()
             ->name('tableName');
+
+        $this->assertTrue($adapter->exec($query));
+
+        $query = Schema::drop()
+            ->name('tableNameAddIndex');
 
         $this->assertTrue($adapter->exec($query));
 
