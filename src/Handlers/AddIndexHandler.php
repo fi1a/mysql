@@ -95,18 +95,18 @@ class AddIndexHandler extends AbstractMySqlHandler
 
         if (mb_strtolower($query['index']['type']) === 'primary') {
             $sql .= ' PRIMARY KEY';
-        }
-        if (mb_strtolower($query['index']['type']) === 'foreign') {
-            $sql .= ' FOREIGN KEY';
-        }
-        if (mb_strtolower($query['index']['type']) === 'unique') {
+        } elseif (mb_strtolower($query['index']['type']) === 'foreign') {
+            $sql .= ' CONSTRAINT';
+        } elseif (mb_strtolower($query['index']['type']) === 'unique') {
             $sql .= ' UNIQUE';
-        }
-        if (mb_strtolower($query['index']['type']) === 'index') {
+        } elseif (mb_strtolower($query['index']['type']) === 'index') {
             $sql .= ' INDEX';
         }
         if (mb_strtolower($query['index']['type']) !== 'primary') {
             $sql .= ' ' . $this->naming->wrapColumnName($query['index']['name']);
+        }
+        if (mb_strtolower($query['index']['type']) === 'foreign') {
+            $sql .= ' FOREIGN KEY';
         }
 
         $columns = '';

@@ -143,6 +143,70 @@ class MySqlAdapterTest extends TestCase
     }
 
     /**
+     * Удаление первичного ключа
+     *
+     * @depends testAddPrimaryIndex
+     */
+    public function testDropPrimaryIndex(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::dropIndex()
+            ->table('tableNameAddIndex')
+            ->primary();
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Удаление индекса
+     *
+     * @depends testAddIndex
+     */
+    public function testDropIndex(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::dropIndex()
+            ->table('tableNameAddIndex')
+            ->index('ixIndex');
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Удаление уникального индекса
+     *
+     * @depends testAddUniqueIndex
+     */
+    public function testDropUniqueIndex(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::dropIndex()
+            ->table('tableNameAddIndex')
+            ->unique('ixUnique');
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Удаление внешнего ключа
+     *
+     * @depends testAddForeignIndex
+     */
+    public function testDropForeignIndex(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::dropIndex()
+            ->table('tableNameAddIndex')
+            ->foreign('ixForeign');
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
      * Создание таблицы с типом integer
      *
      * @depends testCreateTable
