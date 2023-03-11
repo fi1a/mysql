@@ -9,6 +9,7 @@ use Fi1a\DB\Adapters\HandlerInterface;
 use Fi1a\DB\Exceptions\QueryErrorException;
 use Fi1a\MySql\Handlers\AddIndexHandler;
 use Fi1a\MySql\Handlers\CreateTableHandler;
+use Fi1a\MySql\Handlers\DropIndexHandler;
 use Fi1a\MySql\Handlers\DropTableHandler;
 use PDO;
 use PDOException;
@@ -96,6 +97,8 @@ class MySqlAdapter extends AbstractSqlAdapter
                 return new DropTableHandler($this->connection, $this->naming);
             case 'addIndex':
                 return new AddIndexHandler($this->connection, $this->naming);
+            case 'dropIndex':
+                return new DropIndexHandler($this->connection, $this->naming);
         }
 
         throw new QueryErrorException(sprintf('Неизвестный запрос %s', $type));
