@@ -8,6 +8,7 @@ use Fi1a\DB\Adapters\AbstractSqlAdapter;
 use Fi1a\DB\Adapters\HandlerInterface;
 use Fi1a\DB\Exceptions\QueryErrorException;
 use Fi1a\MySql\Handlers\AddIndexHandler;
+use Fi1a\MySql\Handlers\AlterTableHandler;
 use Fi1a\MySql\Handlers\CreateTableHandler;
 use Fi1a\MySql\Handlers\DropIndexHandler;
 use Fi1a\MySql\Handlers\DropTableHandler;
@@ -92,7 +93,17 @@ class MySqlAdapter extends AbstractSqlAdapter
     {
         switch ($type) {
             case 'createTable':
-                return new CreateTableHandler($this->connection, $this->naming);
+                return new CreateTableHandler(
+                    $this->connection,
+                    $this->naming,
+                    new AddIndexHandler($this->connection, $this->naming)
+                );
+            case 'alterTable':
+                return new AlterTableHandler(
+                    $this->connection,
+                    $this->naming,
+                    new AddIndexHandler($this->connection, $this->naming)
+                );
             case 'dropTable':
                 return new DropTableHandler($this->connection, $this->naming);
             case 'addIndex':
