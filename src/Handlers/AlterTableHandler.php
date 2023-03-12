@@ -31,6 +31,7 @@ class AlterTableHandler extends CreateTableHandler
             'addColumns:*:columnName' => 'string|required',
             'addColumns:*:type' => 'string|required',
             'addColumns:*:nullable' => 'boolean',
+            'addColumns:*:rename' => 'null',
             'addColumns:*:primary' => OneOf::create()->generic([
                 'increments' => 'boolean',
             ])->null(),

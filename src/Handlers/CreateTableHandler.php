@@ -45,6 +45,7 @@ class CreateTableHandler extends AbstractMySqlHandler
             'columns:*:columnName' => 'string|required',
             'columns:*:type' => 'string|required',
             'columns:*:nullable' => 'boolean',
+            'columns:*:rename' => 'null',
             'columns:*:primary' => OneOf::create()->generic([
                 'increments' => 'boolean',
             ])->null(),

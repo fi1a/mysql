@@ -12,6 +12,7 @@ use Fi1a\MySql\Handlers\AlterTableHandler;
 use Fi1a\MySql\Handlers\CreateTableHandler;
 use Fi1a\MySql\Handlers\DropIndexHandler;
 use Fi1a\MySql\Handlers\DropTableHandler;
+use Fi1a\MySql\Handlers\RenameTableHandler;
 use PDO;
 use PDOException;
 
@@ -106,6 +107,8 @@ class MySqlAdapter extends AbstractSqlAdapter
                 );
             case 'dropTable':
                 return new DropTableHandler($this->connection, $this->naming);
+            case 'renameTable':
+                return new RenameTableHandler($this->connection, $this->naming);
             case 'addIndex':
                 return new AddIndexHandler($this->connection, $this->naming);
             case 'dropIndex':

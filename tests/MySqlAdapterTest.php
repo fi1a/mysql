@@ -351,6 +351,22 @@ class MySqlAdapterTest extends TestCase
     }
 
     /**
+     * Удаление колонок
+     *
+     * @depends testCreateTable
+     */
+    public function testRenameTable(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::rename()
+            ->name('tableNameAddIndex')
+            ->newName('tableNameRename');
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
      * Удаление таблицы
      *
      * @depends testCreateTableWithIndex
@@ -365,7 +381,7 @@ class MySqlAdapterTest extends TestCase
         $this->assertTrue($adapter->exec($query));
 
         $query = Schema::drop()
-            ->name('tableNameAddIndex');
+            ->name('tableNameRename');
 
         $this->assertTrue($adapter->exec($query));
 
