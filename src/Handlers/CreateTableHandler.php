@@ -4,17 +4,31 @@ declare(strict_types=1);
 
 namespace Fi1a\MySql\Handlers;
 
+use Fi1a\DB\Adapters\HandlerInterface;
 use Fi1a\DB\Exceptions\QueryErrorException;
 use Fi1a\MySql\Facades\ColumnTypeRegistry;
+use Fi1a\MySql\NamingInterface;
 use Fi1a\Validation\Error;
 use Fi1a\Validation\OneOf;
 use Fi1a\Validation\Validator;
+use PDO;
 
 /**
  * Обработчик создания таблицы
  */
 class CreateTableHandler extends AbstractMySqlHandler
 {
+    /**
+     * @var HandlerInterface
+     */
+    protected $addIndexHandler;
+
+    public function __construct(PDO $connection, NamingInterface $naming, HandlerInterface $addIndexHandler)
+    {
+        parent::__construct($connection, $naming);
+        $this->addIndexHandler = $addIndexHandler;
+    }
+
     /**
      * @inheritDoc
      * @psalm-suppress UndefinedInterfaceMethod
@@ -82,59 +96,90 @@ class CreateTableHandler extends AbstractMySqlHandler
         $sqlPart = '';
 
         foreach ($query['columns'] as $index => $column) {
-            $params = isset($column['params']) ? (array) $column['params'] : null;
-            $type = ColumnTypeRegistry::get(
-                (string) $column['type'],
-                $this->connection,
-                (string) $column['columnName'],
-                $params
-            );
-            $sql .= ($index > 0 ? ', ' : '')
-                . $this->naming->wrapColumnName($column['columnName']) . ' ' . $type->getSql();
-            $sql .= ' ' . (isset($column['nullable']) && $column['nullable'] ? 'NULL' : 'NOT NULL');
-            if (isset($column['default'])) {
-                $sql .= ' DEFAULT ' . $type->conversionTo($column['default']);
-            }
-            if (isset($column['primary']) && is_array($column['primary'])) {
-                $sql .= ' PRIMARY KEY';
-                if (isset($column['primary']['increments']) && $column['primary']['increments']) {
-                    $sql .= ' AUTO_INCREMENT';
-                }
-            }
-            if (isset($column['unique']) && is_array($column['unique'])) {
-                $sqlPart .= ($sqlPart ? ', ' : '')
-                    . 'UNIQUE KEY ' . $this->naming->wrapColumnName($column['unique']['name'])
-                    . ' (' . $this->naming->wrapColumnName($column['columnName']) . ')';
-            }
-            if (isset($column['foreign']) && is_array($column['foreign'])) {
-                $sqlPart .= ($sqlPart ? ', ' : '')
-                    . 'FOREIGN KEY ' . $this->naming->wrapColumnName($column['foreign']['name']) . ' ('
-                    . $this->naming->wrapColumnName($column['columnName']) . ') '
-                    . 'REFERENCES ' . $this->naming->wrapTableName($column['foreign']['on']) . ' ';
+            $sql .= ($index > 0 ? ', ' : '') . $this->getColumnSql($column);
 
-                $columns = '';
-                foreach ($column['foreign']['references'] as $columnName) {
-                    $columns .= ($columns ? ', ' : '') . $this->naming->wrapColumnName($columnName);
-                }
-                $sqlPart .= ' (' . $columns . ')';
-
-                if (isset($column['foreign']['onDelete'])) {
-                    $sqlPart .= ' ON DELETE ' . $column['foreign']['onDelete'];
-                }
-                if (isset($column['foreign']['onUpdate'])) {
-                    $sqlPart .= ' ON UPDATE ' . $column['foreign']['onUpdate'];
-                }
-            }
-            if (isset($column['index']) && is_array($column['index'])) {
-                $sqlPart .= ($sqlPart ? ', ' : '')
-                    . 'INDEX ' . $this->naming->wrapColumnName($column['index']['name']) . ' ('
-                    . $this->naming->wrapColumnName($column['columnName']) . ')';
-            }
+            $sqlPart .= $this->getAddIndexesSql($column, $query['tableName']);
         }
+        $sql .= ');';
+
         if ($sqlPart) {
-            $sql .= ', ' . $sqlPart;
+            $sql .= $sqlPart;
         }
 
-        return $sql . ');';
+        return $sql;
+    }
+
+    /**
+     * Возвращает sql для колонок
+     *
+     * @param mixed[] $column
+     */
+    protected function getColumnSql(array $column): string
+    {
+        $params = isset($column['params']) ? (array) $column['params'] : null;
+        $type = ColumnTypeRegistry::get(
+            (string) $column['type'],
+            $this->connection,
+            (string) $column['columnName'],
+            $params
+        );
+        $sql = $this->naming->wrapColumnName((string) $column['columnName']);
+        if (isset($column['rename']) && $column['rename']) {
+            $sql .= ' ' . $this->naming->wrapColumnName((string) $column['rename']);
+        }
+        $sql .= ' ' . $type->getSql();
+        $sql .= ' ' . (isset($column['nullable']) && $column['nullable'] ? 'NULL' : 'NOT NULL');
+        if (isset($column['default'])) {
+            $sql .= ' DEFAULT ' . $type->conversionTo($column['default']);
+        }
+        if (isset($column['primary']) && is_array($column['primary'])) {
+            $sql .= ' PRIMARY KEY';
+            if (isset($column['primary']['increments']) && $column['primary']['increments']) {
+                $sql .= ' AUTO_INCREMENT';
+            }
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Возвращает sql добавления индекса
+     *
+     * @param mixed[] $column
+     */
+    protected function getAddIndexSql(string $indexType, array $column, string $tableName): string
+    {
+        $index = (array) $column[$indexType];
+        $index['type'] = $indexType;
+        $index['tableName'] = $tableName;
+        $index['columns'] = [$column['columnName']];
+
+        /** @var string $sql */
+        $sql = $this->addIndexHandler->prepare([
+            'type' => 'addIndex',
+            'index' => $index,
+        ]);
+
+        return $sql;
+    }
+
+    /**
+     * Возвращает sql добавления индексов
+     *
+     * @param mixed[] $column
+     */
+    protected function getAddIndexesSql(array $column, string $tableName): string
+    {
+        if (isset($column['unique']) && is_array($column['unique'])) {
+            return ' ' . $this->getAddIndexSql('unique', $column, $tableName);
+        }
+        if (isset($column['foreign']) && is_array($column['foreign'])) {
+            return ' ' . $this->getAddIndexSql('foreign', $column, $tableName);
+        }
+        if (isset($column['index']) && is_array($column['index'])) {
+            return ' ' . $this->getAddIndexSql('index', $column, $tableName);
+        }
+
+        return '';
     }
 }

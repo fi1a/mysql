@@ -268,6 +268,89 @@ class MySqlAdapterTest extends TestCase
     }
 
     /**
+     * Добавление колонок таблицы
+     *
+     * @depends testCreateTableWithIndex
+     */
+    public function testAddColumn(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::alter()
+            ->name('tableNameAddIndex')
+            ->addColumn(Column::create()
+                ->name('addPrimary')
+                ->integer()
+                ->primary(true))
+            ->addColumn(Column::create()
+                ->name('addUnique')
+                ->integer()
+                ->default(100)
+                ->unique())
+            ->addColumn(Column::create()
+                ->name('addIndex')
+                ->integer()
+                ->nullable()
+                ->index())
+            ->addColumn(Column::create()
+                ->name('addForeign')
+                ->foreign(
+                    'tableNameForeign',
+                    'id',
+                    ForeignIndexInterface::CASCADE,
+                    ForeignIndexInterface::CASCADE
+                ));
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Добавление первичного ключа
+     *
+     * @depends testCreateTable
+     */
+    public function testChangeColumn(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::alter()
+            ->name('tableNameAddIndex')
+            ->changeColumn(Column::create()
+                ->name('addPrimary')
+                ->rename('changePrimary')
+                ->bigInteger())
+            ->changeColumn(Column::create()
+                ->name('addUnique')
+                ->rename('changeUnique')
+                ->nullable()
+                ->char(50))
+            ->changeColumn(Column::create()
+                ->name('addIndex')
+                ->boolean())
+            ->changeColumn(Column::create()
+                ->name('addForeign')
+                ->rename('changeForeign'));
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Удаление колонок
+     *
+     * @depends testCreateTable
+     */
+    public function testDropColumns(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Schema::alter()
+            ->name('tableNameAddIndex')
+            ->dropColumn('unique', 'index', 'foreign');
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
      * Удаление таблицы
      *
      * @depends testCreateTableWithIndex
