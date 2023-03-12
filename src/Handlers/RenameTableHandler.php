@@ -9,9 +9,9 @@ use Fi1a\Validation\Error;
 use Fi1a\Validation\Validator;
 
 /**
- * Обработчик удаления таблицы
+ * Обработчик переименования таблицы
  */
-class DropTableHandler extends AbstractMySqlHandler
+class RenameTableHandler extends AbstractMySqlHandler
 {
     /**
      * @inheritDoc
@@ -24,7 +24,7 @@ class DropTableHandler extends AbstractMySqlHandler
             $query,
             [
                 'tableName' => 'string|required',
-                'ifExists' => 'boolean',
+                'newTableName' => 'string|required',
             ]
         );
 
@@ -40,21 +40,10 @@ class DropTableHandler extends AbstractMySqlHandler
 
     /**
      * @inheritDoc
-     * @psalm-suppress MixedOperand
-     * @psalm-suppress MixedArrayAccess
-     * @psalm-suppress MixedAssignment
-     * @psalm-suppress MixedArgument
      */
     public function prepare(array $query)
     {
-        $sql = 'DROP TABLE ';
-
-        if ($query['ifExists']) {
-            $sql .= 'IF EXISTS ';
-        }
-
-        $sql .= $this->naming->wrapTableName($query['tableName']) . ';';
-
-        return $sql;
+        return 'RENAME TABLE ' . $this->naming->wrapTableName((string) $query['tableName']) . ' TO '
+            . $this->naming->wrapTableName((string) $query['newTableName']) . ';';
     }
 }
