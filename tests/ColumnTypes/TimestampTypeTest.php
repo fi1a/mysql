@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\MySql\ColumnTypes;
 
+use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
 use Fi1a\DB\Queries\Expressions\SqlExpression;
@@ -39,8 +40,57 @@ class TimestampTypeTest extends TestCase
                 Column::create()
                     ->name('columnDefault')
                     ->timestamp()
+                    ->nullable()
                     ->default(new SqlExpression('CURRENT_TIMESTAMP'))
             );
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Вставка значений
+     *
+     * @depends testCreateTableWithType
+     */
+    public function testInsertWithType(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableName')
+            ->column(
+                Column::create()
+                    ->name('column')
+                    ->timestamp()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnNull')
+                    ->timestamp()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnDefault')
+                    ->timestamp()
+            );
+
+        $query->rows([
+            [
+                'column' => '2023-03-07 01:00:00',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => '2023-03-08 01:00:00',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => '2023-03-09 01:00:00',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ]);
 
         $this->assertTrue($adapter->exec($query));
     }
@@ -65,14 +115,8 @@ class TimestampTypeTest extends TestCase
      */
     public function testConversionTo(): void
     {
-        $timestampType = new TimestampType($this->getAdapter()->getConnection(), 'columnName');
-        $this->assertEquals('100', $timestampType->conversionTo(100));
-        $this->assertEquals('100', $timestampType->conversionTo('100'));
-        $this->assertEquals('0', $timestampType->conversionTo(0));
-        $this->assertEquals(
-            'CURRENT_TIMESTAMP',
-            $timestampType->conversionTo(new SqlExpression('CURRENT_TIMESTAMP'))
-        );
+        $dateTimeType = new TimestampType($this->getAdapter()->getConnection(), 'columnName');
+        $this->assertEquals('\'2023-03-07 01:00:00\'', $dateTimeType->conversionTo('2023-03-07 01:00:00'));
     }
 
     /**
@@ -80,8 +124,7 @@ class TimestampTypeTest extends TestCase
      */
     public function testConversionFrom(): void
     {
-        $timestampType = new TimestampType($this->getAdapter()->getConnection(), 'columnName');
-        $this->assertEquals(100, $timestampType->conversionFrom('100'));
-        $this->assertEquals(0, $timestampType->conversionFrom('0'));
+        $dateTimeType = new TimestampType($this->getAdapter()->getConnection(), 'columnName');
+        $this->assertEquals('2023-03-07 01:00:00', $dateTimeType->conversionFrom('2023-03-07 01:00:00'));
     }
 }

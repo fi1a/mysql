@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\MySql\ColumnTypes;
 
+use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
 use Fi1a\MySql\ColumnTypes\DecimalType;
 use Fi1a\Unit\MySql\TestCases\TestCase;
 
 /**
- * BigInteger
+ * Decimal
  */
 class DecimalTypeTest extends TestCase
 {
@@ -43,8 +44,65 @@ class DecimalTypeTest extends TestCase
                 Column::create()
                     ->name('columnDefault')
                     ->decimal()
+                    ->nullable()
                     ->default(100.02)
             );
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Вставка значений
+     *
+     * @depends testCreateTableWithType
+     */
+    public function testInsertWithType(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableName')
+            ->column(
+                Column::create()
+                    ->name('column')
+                    ->decimal()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnUnsigned')
+                    ->decimal()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnNull')
+                    ->decimal()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnDefault')
+                    ->decimal()
+            );
+
+        $query->rows([
+            [
+                'column' => 1.02,
+                'columnUnsigned' => 1.02,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 2.02,
+                'columnUnsigned' => 2.02,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 3.02,
+                'columnUnsigned' => 3.02,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ]);
 
         $this->assertTrue($adapter->exec($query));
     }

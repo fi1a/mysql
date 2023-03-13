@@ -12,6 +12,7 @@ use Fi1a\MySql\Handlers\AlterTableHandler;
 use Fi1a\MySql\Handlers\CreateTableHandler;
 use Fi1a\MySql\Handlers\DropIndexHandler;
 use Fi1a\MySql\Handlers\DropTableHandler;
+use Fi1a\MySql\Handlers\InsertHandler;
 use Fi1a\MySql\Handlers\RenameTableHandler;
 use PDO;
 use PDOException;
@@ -113,6 +114,8 @@ class MySqlAdapter extends AbstractSqlAdapter
                 return new AddIndexHandler($this->connection, $this->naming);
             case 'dropIndex':
                 return new DropIndexHandler($this->connection, $this->naming);
+            case 'insert':
+                return new InsertHandler($this->connection, $this->naming);
         }
 
         throw new QueryErrorException(sprintf('Неизвестный запрос %s', $type));

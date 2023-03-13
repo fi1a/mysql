@@ -7,7 +7,7 @@ namespace Fi1a\MySql\ColumnTypes;
 /**
  * Timestamp
  */
-class TimestampType extends IntegerType
+class TimestampType extends TextType
 {
     /**
      * @inheritDoc

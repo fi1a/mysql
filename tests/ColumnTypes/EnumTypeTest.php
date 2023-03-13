@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Fi1a\Unit\MySql\ColumnTypes;
 
 use Fi1a\DB\Exceptions\QueryErrorException;
+use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
 use Fi1a\MySql\ColumnTypes\EnumType;
@@ -39,8 +40,57 @@ class EnumTypeTest extends TestCase
                 Column::create()
                     ->name('columnDefault')
                     ->enum(['red', 'green', 'blue'])
+                    ->nullable()
                     ->default('red')
             );
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Вставка значений
+     *
+     * @depends testCreateTableWithType
+     */
+    public function testInsertWithType(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableName')
+            ->column(
+                Column::create()
+                    ->name('column')
+                    ->enum(['red', 'green', 'blue'])
+            )
+            ->column(
+                Column::create()
+                    ->name('columnNull')
+                    ->enum(['red', 'green', 'blue'])
+            )
+            ->column(
+                Column::create()
+                    ->name('columnDefault')
+                    ->enum(['red', 'green', 'blue'])
+            );
+
+        $query->rows([
+            [
+                'column' => 'red',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 'green',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 'blue',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ]);
 
         $this->assertTrue($adapter->exec($query));
     }

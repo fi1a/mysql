@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\MySql\ColumnTypes;
 
+use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
 use Fi1a\MySql\ColumnTypes\DateType;
 use Fi1a\Unit\MySql\TestCases\TestCase;
 
 /**
- * Text
+ * Date
  */
 class DateTypeTest extends TestCase
 {
@@ -38,8 +39,57 @@ class DateTypeTest extends TestCase
                 Column::create()
                     ->name('columnDefault')
                     ->date()
+                    ->nullable()
                     ->default('2023-03-07')
             );
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Вставка значений
+     *
+     * @depends testCreateTableWithType
+     */
+    public function testInsertWithType(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableName')
+            ->column(
+                Column::create()
+                    ->name('column')
+                    ->date()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnNull')
+                    ->date()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnDefault')
+                    ->date()
+            );
+
+        $query->rows([
+            [
+                'column' => '2023-03-07',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => '2023-03-08',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => '2023-03-09',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ]);
 
         $this->assertTrue($adapter->exec($query));
     }
