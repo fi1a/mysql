@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\MySql\ColumnTypes;
 
+use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
 use Fi1a\MySql\ColumnTypes\MediumTextType;
@@ -34,6 +35,46 @@ class MediumTextTypeTest extends TestCase
                     ->mediumText()
                     ->nullable()
             );
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Вставка значений
+     *
+     * @depends testCreateTableWithType
+     */
+    public function testInsertWithType(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableName')
+            ->column(
+                Column::create()
+                    ->name('column')
+                    ->mediumText()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnNull')
+                    ->mediumText()
+            );
+
+        $query->rows([
+            [
+                'column' => 'foo',
+                'columnNull' => null,
+            ],
+            [
+                'column' => 'bar',
+                'columnNull' => null,
+            ],
+            [
+                'column' => 'baz',
+                'columnNull' => null,
+            ],
+        ]);
 
         $this->assertTrue($adapter->exec($query));
     }

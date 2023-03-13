@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\MySql\ColumnTypes;
 
+use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
 use Fi1a\MySql\ColumnTypes\BinaryType;
@@ -34,6 +35,46 @@ class BinaryTypeTest extends TestCase
                     ->binary()
                     ->nullable()
             );
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Вставка значений
+     *
+     * @depends testCreateTableWithType
+     */
+    public function testInsertWithType(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableName')
+            ->column(
+                Column::create()
+                    ->name('column')
+                    ->binary()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnNull')
+                    ->binary()
+            );
+
+        $query->rows([
+            [
+                'column' => 1,
+                'columnNull' => null,
+            ],
+            [
+                'column' => 2,
+                'columnNull' => null,
+            ],
+            [
+                'column' => 3,
+                'columnNull' => null,
+            ],
+        ]);
 
         $this->assertTrue($adapter->exec($query));
     }

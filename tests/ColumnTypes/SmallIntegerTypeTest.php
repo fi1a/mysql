@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\MySql\ColumnTypes;
 
+use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
 use Fi1a\MySql\ColumnTypes\SmallIntegerType;
@@ -43,8 +44,65 @@ class SmallIntegerTypeTest extends TestCase
                 Column::create()
                     ->name('columnDefault')
                     ->smallInteger()
+                    ->nullable()
                     ->default(100)
             );
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Вставка значений
+     *
+     * @depends testCreateTableWithType
+     */
+    public function testInsertWithType(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableName')
+            ->column(
+                Column::create()
+                    ->name('column')
+                    ->smallInteger()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnUnsigned')
+                    ->smallInteger(true)
+            )
+            ->column(
+                Column::create()
+                    ->name('columnNull')
+                    ->smallInteger()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnDefault')
+                    ->smallInteger()
+            );
+
+        $query->rows([
+            [
+                'column' => 1,
+                'columnUnsigned' => 1,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 2,
+                'columnUnsigned' => 2,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 3,
+                'columnUnsigned' => 3,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ]);
 
         $this->assertTrue($adapter->exec($query));
     }

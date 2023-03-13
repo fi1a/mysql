@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Fi1a\Unit\MySql\ColumnTypes;
 
 use Fi1a\DB\Exceptions\QueryErrorException;
+use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
 use Fi1a\MySql\ColumnTypes\StringType;
@@ -39,8 +40,57 @@ class StringTypeTest extends TestCase
                 Column::create()
                     ->name('columnDefault')
                     ->string()
+                    ->nullable()
                     ->default('text')
             );
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Вставка значений
+     *
+     * @depends testCreateTableWithType
+     */
+    public function testInsertWithType(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableName')
+            ->column(
+                Column::create()
+                    ->name('column')
+                    ->string()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnNull')
+                    ->string()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnDefault')
+                    ->string()
+            );
+
+        $query->rows([
+            [
+                'column' => 'foo',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 'bar',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 'baz',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ]);
 
         $this->assertTrue($adapter->exec($query));
     }

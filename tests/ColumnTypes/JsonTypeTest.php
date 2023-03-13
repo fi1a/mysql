@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\MySql\ColumnTypes;
 
+use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
 use Fi1a\MySql\ColumnTypes\JsonType;
@@ -34,6 +35,46 @@ class JsonTypeTest extends TestCase
                     ->json()
                     ->nullable()
             );
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Вставка значений
+     *
+     * @depends testCreateTableWithType
+     */
+    public function testInsertWithType(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableName')
+            ->column(
+                Column::create()
+                    ->name('column')
+                    ->json()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnNull')
+                    ->json()
+            );
+
+        $query->rows([
+            [
+                'column' => [1, 2, 3],
+                'columnNull' => null,
+            ],
+            [
+                'column' => ['foo' => 'bar'],
+                'columnNull' => null,
+            ],
+            [
+                'column' => 'baz',
+                'columnNull' => null,
+            ],
+        ]);
 
         $this->assertTrue($adapter->exec($query));
     }

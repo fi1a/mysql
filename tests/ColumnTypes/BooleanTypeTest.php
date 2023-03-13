@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\MySql\ColumnTypes;
 
+use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
 use Fi1a\MySql\ColumnTypes\BooleanType;
@@ -38,8 +39,57 @@ class BooleanTypeTest extends TestCase
                 Column::create()
                     ->name('columnDefault')
                     ->boolean()
+                    ->nullable()
                     ->default(true)
             );
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Вставка значений
+     *
+     * @depends testCreateTableWithType
+     */
+    public function testInsertWithType(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableName')
+            ->column(
+                Column::create()
+                    ->name('column')
+                    ->boolean()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnNull')
+                    ->boolean()
+            )
+            ->column(
+                Column::create()
+                    ->name('columnDefault')
+                    ->boolean()
+            );
+
+        $query->rows([
+            [
+                'column' => true,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => true,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => false,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ]);
 
         $this->assertTrue($adapter->exec($query));
     }
