@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Fi1a\Unit\MySql;
 
 use Fi1a\DB\Exceptions\QueryErrorException;
+use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
 use Fi1a\DB\Queries\Indexes\ForeignIndexInterface;
@@ -419,5 +420,19 @@ class MySqlAdapterTest extends TestCase
             ->name('tableName');
 
         $adapter->exec($query);
+    }
+
+    /**
+     * Исключение при ошибке в запросе
+     */
+    public function testQueryException(): void
+    {
+        $this->expectException(QueryErrorException::class);
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('notExists');
+
+        $adapter->query($query);
     }
 }

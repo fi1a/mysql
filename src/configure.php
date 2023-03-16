@@ -18,8 +18,8 @@ use Fi1a\MySql\ColumnTypes\JsonType;
 use Fi1a\MySql\ColumnTypes\LongTextType;
 use Fi1a\MySql\ColumnTypes\MediumIntegerType;
 use Fi1a\MySql\ColumnTypes\MediumTextType;
-use Fi1a\MySql\ColumnTypes\Registry;
-use Fi1a\MySql\ColumnTypes\RegistryInterface;
+use Fi1a\MySql\ColumnTypes\Registry as CTRegistry;
+use Fi1a\MySql\ColumnTypes\RegistryInterface as CTRegistryInterface;
 use Fi1a\MySql\ColumnTypes\SmallIntegerType;
 use Fi1a\MySql\ColumnTypes\StringType;
 use Fi1a\MySql\ColumnTypes\TextType;
@@ -27,15 +27,35 @@ use Fi1a\MySql\ColumnTypes\TimeType;
 use Fi1a\MySql\ColumnTypes\TimestampType;
 use Fi1a\MySql\ColumnTypes\TinyIntegerType;
 use Fi1a\MySql\Facades\ColumnTypeRegistry;
+use Fi1a\MySql\Facades\ExpressionRegistry;
+use Fi1a\MySql\Handlers\Expressions\EqExpression;
+use Fi1a\MySql\Handlers\Expressions\Registry as ExpRegistry;
+use Fi1a\MySql\Handlers\Expressions\RegistryInterface as ExpRegistryInterface;
 
 di()->config()->addDefinition(
-    Builder::build(RegistryInterface::class)
+    Builder::build(CTRegistryInterface::class)
         ->defineFactory(function () {
             static $instance;
 
             // @codeCoverageIgnoreStart
             if ($instance === null) {
-                $instance = new Registry();
+                $instance = new CTRegistry();
+            }
+            // @codeCoverageIgnoreEnd
+
+            return $instance;
+        })
+        ->getDefinition()
+);
+
+di()->config()->addDefinition(
+    Builder::build(ExpRegistryInterface::class)
+        ->defineFactory(function () {
+            static $instance;
+
+            // @codeCoverageIgnoreStart
+            if ($instance === null) {
+                $instance = new ExpRegistry();
             }
             // @codeCoverageIgnoreEnd
 
@@ -65,3 +85,5 @@ ColumnTypeRegistry::add('binary', BinaryType::class);
 ColumnTypeRegistry::add('boolean', BooleanType::class);
 ColumnTypeRegistry::add('json', JsonType::class);
 ColumnTypeRegistry::add('enum', EnumType::class);
+
+ExpressionRegistry::add('=', EqExpression::class);

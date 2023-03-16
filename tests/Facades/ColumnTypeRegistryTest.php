@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Реестр типа колонок
  */
-class RegistryTest extends TestCase
+class ColumnTypeRegistryTest extends TestCase
 {
     /**
      * Фасад
