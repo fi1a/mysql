@@ -6,6 +6,7 @@ namespace Fi1a\Unit\MySql\ColumnTypes;
 
 use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
+use Fi1a\DB\Queries\AndWhere;
 use Fi1a\DB\Queries\Column;
 use Fi1a\MySql\ColumnTypes\BigIntegerType;
 use Fi1a\Unit\MySql\TestCases\TestCase;
@@ -105,6 +106,71 @@ class BigIntegerTypeTest extends TestCase
         ]);
 
         $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Запрс выборки
+     */
+    public function testSelectWhereLine(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName')
+            ->column(Column::create()
+                ->name('columnUnsigned')
+                ->bigInteger())
+            ->where('column', '=', 1)
+            ->andWhere('columnUnsigned', '=', 1);
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(1, $items);
+        $this->assertEquals([
+            [
+                'column' => '1',
+                'columnUnsigned' => '1',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ], $items);
+    }
+
+    /**
+     * Запрс выборки
+     */
+    public function testSelectWhereNested(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName', 'tableAlias')
+            ->column(Column::create()
+                ->name('columnUnsigned')
+                ->bigInteger())
+            ->where('column', '=', 1)
+            ->orWhere(
+                AndWhere::create('columnUnsigned', '=', 1)
+                ->orWhere('columnUnsigned', '=', 2)
+            );
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(2, $items);
+        $this->assertEquals([
+            [
+                'column' => '1',
+                'columnUnsigned' => '1',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => '2',
+                'columnUnsigned' => '2',
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ], $items);
     }
 
     /**
