@@ -8,6 +8,7 @@ use Fi1a\DB\Exceptions\QueryErrorException;
 use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\Column;
+use Fi1a\DB\Queries\ColumnType;
 use Fi1a\DB\Queries\Indexes\ForeignIndexInterface;
 use Fi1a\Unit\MySql\TestCases\TestCase;
 
@@ -249,6 +250,86 @@ class MySqlAdapterTest extends TestCase
             );
 
         $this->assertTrue($adapter->exec($query));
+    }
+
+    /**
+     * Вставка значений
+     *
+     * @depends testCreateTableWithIndex
+     */
+    public function testInsert(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableNameForeign')
+            ->column(
+                ColumnType::create()
+                    ->name('id')
+                    ->integer()
+            )
+            ->rows([['id' => 1], ['id' => 2], ['id' => 3]]);
+
+        $this->assertTrue($adapter->exec($query));
+
+        $adapter = $this->getAdapter();
+
+        $query = Query::insert()
+            ->name('tableName')
+            ->column(
+                ColumnType::create()
+                    ->name('primary')
+                    ->integer()
+            )
+            ->column(
+                ColumnType::create()
+                    ->name('index')
+                    ->integer()
+            )
+            ->column(
+                ColumnType::create()
+                    ->name('unique')
+                    ->integer()
+            )
+            ->column(
+                ColumnType::create()
+                    ->name('foreign')
+                    ->integer()
+            )
+            ->rows([
+                [
+                    'primary' => null,
+                    'index' => 1,
+                    'unique'  => 1,
+                    'foreign' => 1,
+                ],
+                [
+                    'primary' => null,
+                    'index' => 2,
+                    'unique'  => 2,
+                    'foreign' => 2,
+                ],
+                [
+                    'primary' => null,
+                    'index' => 3,
+                    'unique'  => 3,
+                    'foreign' => 3,
+                ],
+            ]);
+
+        $this->assertTrue($adapter->exec($query));
+    }
+
+    public function testSelect(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName')
+            ->column(ColumnType::create()->name('primary')->integer())
+            ->where('primary', '=', 1);
+
+        $this->assertCount(1, $adapter->query($query));
     }
 
     /**

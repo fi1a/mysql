@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Fi1a\MySql\Handlers\Expressions;
 
 use Fi1a\MySql\ColumnTypes\ColumnTypeInterface;
+use Fi1a\MySql\NamingInterface;
 
 /**
  * Условие
@@ -12,7 +13,7 @@ use Fi1a\MySql\ColumnTypes\ColumnTypeInterface;
 abstract class AbstractExpression implements ExpressionInterface
 {
     /**
-     * @var string
+     * @var mixed
      */
     protected $column;
 
@@ -27,12 +28,19 @@ abstract class AbstractExpression implements ExpressionInterface
     protected $type;
 
     /**
+     * @var NamingInterface
+     */
+    protected $naming;
+
+    /**
+     * @param mixed $column
      * @param mixed $value
      */
-    public function __construct(string $column, $value, ColumnTypeInterface $type)
+    public function __construct($column, $value, ColumnTypeInterface $type, NamingInterface $naming)
     {
         $this->column = $column;
         $this->value = $value;
         $this->type = $type;
+        $this->naming = $naming;
     }
 }

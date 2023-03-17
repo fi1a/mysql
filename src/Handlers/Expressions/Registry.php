@@ -6,6 +6,7 @@ namespace Fi1a\MySql\Handlers\Expressions;
 
 use Fi1a\DB\Exceptions\UnknownExpressionException;
 use Fi1a\MySql\ColumnTypes\ColumnTypeInterface;
+use Fi1a\MySql\NamingInterface;
 use InvalidArgumentException;
 
 /**
@@ -21,14 +22,19 @@ class Registry implements RegistryInterface
     /**
      * @inheritDoc
      */
-    public function get(string $operation, string $columnName, $value, ColumnTypeInterface $type): ExpressionInterface
-    {
+    public function get(
+        string $operation,
+        $columnName,
+        $value,
+        ColumnTypeInterface $type,
+        NamingInterface $naming
+    ): ExpressionInterface {
         if (!$this->has($operation)) {
             throw new UnknownExpressionException(sprintf('Неизвестное выражение %s', $operation));
         }
         $class = $this->registry[mb_strtolower($operation)];
 
-        return new $class($columnName, $value, $type);
+        return new $class($columnName, $value, $type, $naming);
     }
 
     /**
