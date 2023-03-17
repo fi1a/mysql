@@ -320,6 +320,11 @@ class MySqlAdapterTest extends TestCase
         $this->assertTrue($adapter->exec($query));
     }
 
+    /**
+     * Запрс выборки
+     *
+     * @depends testInsert
+     */
     public function testSelect(): void
     {
         $adapter = $this->getAdapter();
@@ -329,7 +334,75 @@ class MySqlAdapterTest extends TestCase
             ->column(ColumnType::create()->name('primary')->integer())
             ->where('primary', '=', 1);
 
-        $this->assertCount(1, $adapter->query($query));
+        $items = $adapter->query($query);
+
+        $this->assertCount(1, $items);
+        $this->assertEquals([
+            [
+                'primary' => 1,
+            ],
+        ], $items);
+    }
+
+    /**
+     * Запрс выборки
+     *
+     * @depends testInsert
+     */
+    public function testSelectWithAlias(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName')
+            ->column(ColumnType::create()->name('primary')->integer(), 'alias')
+            ->where('primary', '=', 1);
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(1, $items);
+        $this->assertEquals([
+            [
+                'alias' => 1,
+            ],
+        ], $items);
+    }
+
+    /**
+     * Запрс выборки всех полей
+     *
+     * @depends testInsert
+     */
+    public function testSelectAll(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName');
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(3, $items);
+        $this->assertEquals([
+            [
+                'primary' => '1',
+                'index' => '1',
+                'unique' => '1',
+                'foreign' => '1',
+            ],
+            [
+                'primary' => '2',
+                'index' => '2',
+                'unique' => '2',
+                'foreign' => '2',
+            ],
+            [
+                'primary' => '3',
+                'index' => '3',
+                'unique' => '3',
+                'foreign' => '3',
+            ],
+        ], $items);
     }
 
     /**
