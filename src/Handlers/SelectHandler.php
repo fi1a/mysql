@@ -60,7 +60,20 @@ class SelectHandler extends AbstractMySqlHandler
      */
     public function prepare(array $query)
     {
-        $sql = 'SELECT * FROM ';
+        $sql = 'SELECT ';
+
+        $selectColumns = '';
+        foreach ($query['columns'] as $column) {
+            $columnName = $column['column']['columnName'];
+            $selectColumns .= ($selectColumns ? ', ' : '')
+                . ($columnName === '*' ? $columnName : $this->naming->wrapColumnName($columnName));
+            if ($column['alias']) {
+                $selectColumns .= ' as ' . $this->naming->wrapColumnName($column['alias']);
+            }
+        }
+
+        $sql .= $selectColumns . ' FROM ';
+
         $sql .= $this->naming->wrapTableName($query['from']['table']);
         if (is_string($query['from']['alias']) && $query['from']['alias']) {
             $sql .= ' AS ' . $query['from']['alias'];
@@ -118,12 +131,8 @@ class SelectHandler extends AbstractMySqlHandler
 
             /** @var mixed $firstColumn */
             $firstColumn = $item['column'];
-            if (is_string($firstColumn) && $firstColumn !== '') {
-                $firstColumn = [
-                    'columnName' => $firstColumn,
-                ];
-            }
-            $firstColumnName = null;
+            /** @var mixed $firstColumnName */
+            $firstColumnName = $item['column'];
             if (is_array($firstColumn) && isset($firstColumn['columnName']) && $firstColumn['columnName'] !== '') {
                 /** @var string $firstColumnName */
                 $firstColumnName = $firstColumn['columnName'];
@@ -139,19 +148,29 @@ class SelectHandler extends AbstractMySqlHandler
                 $secondColumnName = $secondColumn['columnName'];
             }
 
-            /** @var array{column: array{columnName: string}} $column */
+            /** @var array{column: array{columnName: string}, alias: string|null} $column */
             foreach ($columns as $column) {
                 if (
                     is_string($firstColumnName)
-                    && $this->naming->wrapColumnName($column['column']['columnName'])
-                    === $this->naming->wrapColumnName($firstColumnName)
+                    && ($this->naming->wrapColumnName($column['column']['columnName'])
+                        === $this->naming->wrapColumnName($firstColumnName)
+                        || ($column['alias']
+                            && $this->naming->wrapColumnName($column['alias'])
+                            === $this->naming->wrapColumnName($firstColumnName)
+                        )
+                    )
                 ) {
                     $firstColumn = $column['column'];
                 }
                 if (
                     is_string($secondColumnName)
-                    && $this->naming->wrapColumnName($column['column']['columnName'])
-                    === $this->naming->wrapColumnName($secondColumnName)
+                    && ($this->naming->wrapColumnName($column['column']['columnName'])
+                        === $this->naming->wrapColumnName($secondColumnName)
+                        || ($column['alias']
+                            && $this->naming->wrapColumnName($column['alias'])
+                            === $this->naming->wrapColumnName($secondColumnName)
+                        )
+                    )
                 ) {
                     $secondColumn = $column['column'];
                 }

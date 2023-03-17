@@ -8,7 +8,6 @@ use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\AndWhere;
 use Fi1a\DB\Queries\Column;
-use Fi1a\DB\Queries\ColumnName;
 use Fi1a\DB\Queries\ColumnType;
 use Fi1a\MySql\ColumnTypes\BigIntegerType;
 use Fi1a\Unit\MySql\TestCases\TestCase;
@@ -135,8 +134,6 @@ class BigIntegerTypeTest extends TestCase
             [
                 'column' => 1,
                 'columnUnsigned' => 1,
-                'columnNull' => null,
-                'columnDefault' => null,
             ],
         ], $items);
     }
@@ -164,16 +161,10 @@ class BigIntegerTypeTest extends TestCase
         $this->assertCount(2, $items);
         $this->assertEquals([
             [
-                'column' => '1',
                 'columnUnsigned' => 1,
-                'columnNull' => null,
-                'columnDefault' => null,
             ],
             [
-                'column' => '2',
                 'columnUnsigned' => 2,
-                'columnNull' => null,
-                'columnDefault' => null,
             ],
         ], $items);
     }
@@ -198,9 +189,30 @@ class BigIntegerTypeTest extends TestCase
         $this->assertEquals([
             [
                 'column' => 1,
-                'columnUnsigned' => 1,
-                'columnNull' => null,
-                'columnDefault' => null,
+            ],
+        ], $items);
+    }
+
+    /**
+     * Условие равно
+     */
+    public function testEqAliasExpression(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName')
+            ->column(ColumnType::create()
+                ->name('column')
+                ->bigInteger(), 'alias')
+            ->where('alias', '=', 1);
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(1, $items);
+        $this->assertEquals([
+            [
+                'alias' => 1,
             ],
         ], $items);
     }
@@ -225,9 +237,6 @@ class BigIntegerTypeTest extends TestCase
         $this->assertEquals([
             [
                 'column' => 1,
-                'columnUnsigned' => 1,
-                'columnNull' => null,
-                'columnDefault' => null,
             ],
         ], $items);
     }
@@ -251,22 +260,13 @@ class BigIntegerTypeTest extends TestCase
         $this->assertCount(3, $items);
         $this->assertEquals([
             [
-                'column' => 1,
                 'columnUnsigned' => 1,
-                'columnNull' => null,
-                'columnDefault' => null,
             ],
             [
-                'column' => 2,
                 'columnUnsigned' => 2,
-                'columnNull' => null,
-                'columnDefault' => null,
             ],
             [
-                'column' => 3,
                 'columnUnsigned' => 3,
-                'columnNull' => null,
-                'columnDefault' => null,
             ],
         ], $items);
     }
@@ -287,9 +287,9 @@ class BigIntegerTypeTest extends TestCase
                 ->name('columnUnsigned')
                 ->bigInteger(true))
             ->where(
-                ColumnName::create()->name('column'),
+                ColumnType::create()->name('column'),
                 '=',
-                ColumnName::create()->name('columnUnsigned')
+                ColumnType::create()->name('columnUnsigned')
             );
 
         $items = $adapter->query($query);
@@ -299,22 +299,38 @@ class BigIntegerTypeTest extends TestCase
             [
                 'column' => 1,
                 'columnUnsigned' => 1,
-                'columnNull' => null,
-                'columnDefault' => null,
             ],
             [
                 'column' => 2,
                 'columnUnsigned' => 2,
-                'columnNull' => null,
-                'columnDefault' => null,
             ],
             [
                 'column' => 3,
                 'columnUnsigned' => 3,
-                'columnNull' => null,
-                'columnDefault' => null,
             ],
         ], $items);
+    }
+
+    /**
+     * Условие равно
+     */
+    public function testEqNotColumnExpression(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName', 'tableAlias')
+            ->column(ColumnType::create()
+                ->name('column')
+                ->bigInteger())
+            ->column(ColumnType::create()
+                ->name('columnUnsigned')
+                ->bigInteger(true))
+            ->where('foo', '=', 'bar');
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(0, $items);
     }
 
     /**
