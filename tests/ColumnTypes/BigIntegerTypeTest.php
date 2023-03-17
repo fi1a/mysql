@@ -8,6 +8,8 @@ use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
 use Fi1a\DB\Queries\AndWhere;
 use Fi1a\DB\Queries\Column;
+use Fi1a\DB\Queries\ColumnName;
+use Fi1a\DB\Queries\ColumnType;
 use Fi1a\MySql\ColumnTypes\BigIntegerType;
 use Fi1a\Unit\MySql\TestCases\TestCase;
 
@@ -117,8 +119,11 @@ class BigIntegerTypeTest extends TestCase
 
         $query = Query::select()
             ->from('tableName')
-            ->column(Column::create()
+            ->column(ColumnType::create()
                 ->name('columnUnsigned')
+                ->bigInteger(true))
+            ->column(ColumnType::create()
+                ->name('column')
                 ->bigInteger())
             ->where('column', '=', 1)
             ->andWhere('columnUnsigned', '=', 1);
@@ -128,8 +133,8 @@ class BigIntegerTypeTest extends TestCase
         $this->assertCount(1, $items);
         $this->assertEquals([
             [
-                'column' => '1',
-                'columnUnsigned' => '1',
+                'column' => 1,
+                'columnUnsigned' => 1,
                 'columnNull' => null,
                 'columnDefault' => null,
             ],
@@ -145,9 +150,9 @@ class BigIntegerTypeTest extends TestCase
 
         $query = Query::select()
             ->from('tableName', 'tableAlias')
-            ->column(Column::create()
+            ->column(ColumnType::create()
                 ->name('columnUnsigned')
-                ->bigInteger())
+                ->bigInteger(true))
             ->where('column', '=', 1)
             ->orWhere(
                 AndWhere::create('columnUnsigned', '=', 1)
@@ -160,13 +165,152 @@ class BigIntegerTypeTest extends TestCase
         $this->assertEquals([
             [
                 'column' => '1',
-                'columnUnsigned' => '1',
+                'columnUnsigned' => 1,
                 'columnNull' => null,
                 'columnDefault' => null,
             ],
             [
                 'column' => '2',
-                'columnUnsigned' => '2',
+                'columnUnsigned' => 2,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ], $items);
+    }
+
+    /**
+     * Условие равно
+     */
+    public function testEqExpression(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName', 'tableAlias')
+            ->column(ColumnType::create()
+                ->name('column')
+                ->bigInteger())
+            ->where('column', '=', 1);
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(1, $items);
+        $this->assertEquals([
+            [
+                'column' => 1,
+                'columnUnsigned' => 1,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ], $items);
+    }
+
+    /**
+     * Условие равно
+     */
+    public function testEqSecondColumnExpression(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName', 'tableAlias')
+            ->column(ColumnType::create()
+                ->name('column')
+                ->bigInteger())
+            ->where(1, '=', ColumnType::create()->name('column')->integer());
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(1, $items);
+        $this->assertEquals([
+            [
+                'column' => 1,
+                'columnUnsigned' => 1,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ], $items);
+    }
+
+    /**
+     * Условие равно
+     */
+    public function testEqValueExpression(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName', 'tableAlias')
+            ->column(ColumnType::create()
+                ->name('columnUnsigned')
+                ->bigInteger(true))
+            ->where(1, '=', 1);
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(3, $items);
+        $this->assertEquals([
+            [
+                'column' => 1,
+                'columnUnsigned' => 1,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 2,
+                'columnUnsigned' => 2,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 3,
+                'columnUnsigned' => 3,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+        ], $items);
+    }
+
+    /**
+     * Условие равно
+     */
+    public function testEqColumnExpression(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName', 'tableAlias')
+            ->column(ColumnType::create()
+                ->name('column')
+                ->bigInteger())
+            ->column(ColumnType::create()
+                ->name('columnUnsigned')
+                ->bigInteger(true))
+            ->where(
+                ColumnName::create()->name('column'),
+                '=',
+                ColumnName::create()->name('columnUnsigned')
+            );
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(3, $items);
+        $this->assertEquals([
+            [
+                'column' => 1,
+                'columnUnsigned' => 1,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 2,
+                'columnUnsigned' => 2,
+                'columnNull' => null,
+                'columnDefault' => null,
+            ],
+            [
+                'column' => 3,
+                'columnUnsigned' => 3,
                 'columnNull' => null,
                 'columnDefault' => null,
             ],

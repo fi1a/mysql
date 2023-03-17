@@ -8,6 +8,7 @@ use Fi1a\DB\Exceptions\UnknownExpressionException;
 use Fi1a\MySql\Facades\ColumnTypeRegistry;
 use Fi1a\MySql\Handlers\Expressions\EqExpression;
 use Fi1a\MySql\Handlers\Expressions\Registry;
+use Fi1a\MySql\Naming;
 use Fi1a\Unit\MySql\TestCases\TestCase;
 use InvalidArgumentException;
 
@@ -33,7 +34,12 @@ class RegistryTest extends TestCase
                 '=',
                 'columnName',
                 1,
-                ColumnTypeRegistry::get('bigInteger', $this->getAdapter()->getConnection(), 'columnName')
+                ColumnTypeRegistry::get(
+                    'bigInteger',
+                    $this->getAdapter()->getConnection(),
+                    'columnName'
+                ),
+                new Naming(null)
             )
         );
         $this->assertTrue($registry->remove('='));
@@ -61,7 +67,8 @@ class RegistryTest extends TestCase
             'unknown',
             'columnName',
             1,
-            ColumnTypeRegistry::get('bigInteger', $this->getAdapter()->getConnection(), 'columnName')
+            ColumnTypeRegistry::get('bigInteger', $this->getAdapter()->getConnection(), 'columnName'),
+            new Naming(null)
         );
     }
 }

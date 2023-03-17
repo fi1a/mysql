@@ -14,6 +14,31 @@ class EqExpression extends AbstractExpression
      */
     public function getSql(): string
     {
-        return $this->column . '=' . $this->type->conversionTo($this->value);
+        $sql = '';
+        if (
+            is_array($this->column)
+            && isset($this->column['columnName'])
+            && is_string($this->column['columnName'])
+            && $this->column['columnName'] !== ''
+        ) {
+            $sql .= $this->naming->wrapColumnName($this->column['columnName']);
+        } else {
+            $sql .= $this->type->conversionTo($this->column);
+        }
+
+        $sql .= '=';
+
+        if (
+            is_array($this->value)
+            && isset($this->value['columnName'])
+            && is_string($this->value['columnName'])
+            && $this->value['columnName'] !== ''
+        ) {
+            $sql .= $this->naming->wrapColumnName($this->value['columnName']);
+        } else {
+            $sql .= $this->type->conversionTo($this->value);
+        }
+
+        return $sql;
     }
 }

@@ -7,6 +7,7 @@ namespace Fi1a\MySql;
 use Fi1a\DB\Adapters\AbstractSqlAdapter;
 use Fi1a\DB\Adapters\HandlerInterface;
 use Fi1a\DB\Exceptions\QueryErrorException;
+use Fi1a\MySql\Facades\ColumnTypeRegistry;
 use Fi1a\MySql\Handlers\AddIndexHandler;
 use Fi1a\MySql\Handlers\AlterTableHandler;
 use Fi1a\MySql\Handlers\CreateTableHandler;
@@ -79,6 +80,39 @@ class MySqlAdapter extends AbstractSqlAdapter
         }
 
         return $items === false ? [] : $items;
+    }
+
+    /**
+     * @inheritDoc
+     * @psalm-suppress MixedArrayAccess
+     */
+    public function query($query): array
+    {
+        $items = $this->querySql((string) $this->prepare($query));
+        $query = $this->getQuery($query);
+
+        /** @var mixed[] $column */
+        foreach ($query['columns'] as $column) {
+            $columnName = (string) $column['column']['columnName'];
+            /** @var mixed[]|null $params */
+            $params = $column['column']['params'];
+
+            $type = ColumnTypeRegistry::get(
+                (string) $column['column']['type'],
+                $this->connection,
+                $columnName,
+                $params
+            );
+
+            foreach ($items as $index => $item) {
+                if (isset($item[$columnName])) {
+                    /** @psalm-suppress MixedAssignment */
+                    $items[$index][$columnName] = $type->conversionFrom((string) $item[$columnName]);
+                }
+            }
+        }
+
+        return $items;
     }
 
     /**

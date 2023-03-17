@@ -84,7 +84,7 @@ class SelectHandler extends AbstractMySqlHandler
             );
         }
 
-        return $sql;
+        return $sql . ';';
     }
 
     /**
@@ -110,45 +110,98 @@ class SelectHandler extends AbstractMySqlHandler
             }
             $sql .= $sql || $isAddLogic ? ' ' . $logic . ' ' : '';
 
-            if (isset($item['column']) && is_array($item['column'])) {
+            if (isset($item['column']) && is_array($item['column']) && !isset($item['column']['columnName'])) {
                 $sql .= '(' . $this->getWhereSql($defaultColumnType, $columns, $item['column']) . ')';
 
                 continue;
             }
 
-            $columnType = null;
+            /** @var mixed $firstColumn */
+            $firstColumn = $item['column'];
+            if (is_string($firstColumn) && $firstColumn !== '') {
+                $firstColumn = [
+                    'columnName' => $firstColumn,
+                ];
+            }
+            $firstColumnName = null;
+            if (is_array($firstColumn) && isset($firstColumn['columnName']) && $firstColumn['columnName'] !== '') {
+                /** @var string $firstColumnName */
+                $firstColumnName = $firstColumn['columnName'];
+            }
+            $secondColumn = null;
+            $secondColumnName = null;
+            if (isset($item['value'])) {
+                /** @var mixed $secondColumn */
+                $secondColumn = $item['value'];
+            }
+            if (is_array($secondColumn) && isset($secondColumn['columnName']) && $secondColumn['columnName'] !== '') {
+                /** @var string $secondColumnName */
+                $secondColumnName = $secondColumn['columnName'];
+            }
+
             /** @var array{column: array{columnName: string}} $column */
             foreach ($columns as $column) {
                 if (
-                    $this->naming->wrapColumnName($column['column']['columnName'])
-                    === $this->naming->wrapColumnName((string) $item['column'])
+                    is_string($firstColumnName)
+                    && $this->naming->wrapColumnName($column['column']['columnName'])
+                    === $this->naming->wrapColumnName($firstColumnName)
                 ) {
-                    $columnType = $column['column'];
-
-                    break;
+                    $firstColumn = $column['column'];
+                }
+                if (
+                    is_string($secondColumnName)
+                    && $this->naming->wrapColumnName($column['column']['columnName'])
+                    === $this->naming->wrapColumnName($secondColumnName)
+                ) {
+                    $secondColumn = $column['column'];
                 }
             }
-            if (!$columnType) {
+
+            $columnType = null;
+            $params = null;
+            $columnNameType = null;
+            if (
+                is_array($firstColumn)
+                && isset($firstColumn['type'])
+                && $firstColumn['type'] !== ''
+            ) {
+                $columnType = $firstColumn;
+                /** @var mixed[] $params */
+                $params = $firstColumn['params'];
+                /** @var string $columnNameType */
+                $columnNameType = $firstColumnName;
+            }
+            if (
+                !$columnType
+                && isset($secondColumn['type'])
+                && $secondColumn['type'] !== ''
+            ) {
+                $columnType = $secondColumn;
+                /** @var mixed[] $params */
+                $params = $secondColumn['params'];
+                /** @var string $columnNameType */
+                $columnNameType = $secondColumnName;
+            }
+            if ($columnType === null) {
                 $columnType = $defaultColumnType;
             }
-
-            $params = null;
-            if (isset($columnType['params']) && is_array($columnType['params'])) {
-                $params = $columnType['params'];
+            if ($columnNameType === null) {
+                $columnNameType = '';
             }
 
             $type = ColumnTypeRegistry::get(
                 (string) $columnType['type'],
                 $this->connection,
-                (string) $item['column'],
+                $columnNameType,
                 $params
             );
 
             $expression = ExpressionRegistry::get(
                 $item['operation'] ? (string) $item['operation'] : '=',
-                $this->naming->wrapColumnName((string) $item['column']),
-                $item['value'] ?? null,
-                $type
+                $firstColumn,
+                $secondColumn,
+                $type,
+                $this->naming
             );
 
             $sql .= $expression->getSql();
