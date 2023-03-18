@@ -54,31 +54,44 @@ abstract class AbstractExpression implements ExpressionInterface
      */
     public function getSql(): string
     {
-        $sql = '';
-        if (
-            is_array($this->column)
-            && isset($this->column['columnName'])
-            && is_string($this->column['columnName'])
-            && $this->column['columnName'] !== ''
-        ) {
-            $sql .= $this->naming->wrapColumnName($this->column['columnName']);
-        } else {
-            $sql .= $this->type->conversionTo($this->column);
-        }
-
+        $sql = $this->getFirstPartSql();
         $sql .= ' ' . $this->getExpressionSignSql() . ' ';
+        $sql .= $this->getSecondPartSql();
 
+        return $sql;
+    }
+
+    /**
+     * Sql второй части
+     */
+    protected function getSecondPartSql(): string
+    {
         if (
             is_array($this->value)
             && isset($this->value['columnName'])
             && is_string($this->value['columnName'])
             && $this->value['columnName'] !== ''
         ) {
-            $sql .= $this->naming->wrapColumnName($this->value['columnName']);
-        } else {
-            $sql .= $this->type->conversionTo($this->value);
+            return $this->naming->wrapColumnName($this->value['columnName']);
         }
 
-        return $sql;
+        return $this->type->conversionTo($this->value);
+    }
+
+    /**
+     * Sql первой части
+     */
+    protected function getFirstPartSql(): string
+    {
+        if (
+            is_array($this->column)
+            && isset($this->column['columnName'])
+            && is_string($this->column['columnName'])
+            && $this->column['columnName'] !== ''
+        ) {
+            return $this->naming->wrapColumnName($this->column['columnName']);
+        }
+
+        return $this->type->conversionTo($this->column);
     }
 }
