@@ -12,9 +12,9 @@ use Fi1a\DB\Queries\ColumnType;
 use Fi1a\Unit\MySql\TestCases\TestCase;
 
 /**
- * Условие "BETWEEN"
+ * Условие "NOT BETWEEN"
  */
-class BetweenExpressionTest extends TestCase
+class NotBetweenExpressionTest extends TestCase
 {
     /**
      * Создание таблицы с типом
@@ -120,17 +120,14 @@ class BetweenExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('column')
                 ->bigInteger())
-            ->where('column', 'between', [1, 2]);
+            ->where('column', 'not between', [1, 2]);
 
         $items = $adapter->query($query);
 
-        $this->assertCount(2, $items);
+        $this->assertCount(1, $items);
         $this->assertEquals([
             [
-                'column' => 1,
-            ],
-            [
-                'column' => 2,
+                'column' => 3,
             ],
         ], $items);
     }
@@ -147,17 +144,14 @@ class BetweenExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('column')
                 ->bigInteger(), 'alias')
-            ->where('alias', 'between', [1, 2]);
+            ->where('alias', 'not between', [1, 2]);
 
         $items = $adapter->query($query);
 
-        $this->assertCount(2, $items);
+        $this->assertCount(1, $items);
         $this->assertEquals([
             [
-                'alias' => 1,
-            ],
-            [
-                'alias' => 2,
+                'alias' => 3,
             ],
         ], $items);
     }
@@ -175,7 +169,7 @@ class BetweenExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('column')
                 ->bigInteger())
-            ->where(1, 'between', ColumnType::create()->name('column')->integer());
+            ->where(1, 'not between', ColumnType::create()->name('column')->integer());
 
         $adapter->query($query);
     }
@@ -192,7 +186,7 @@ class BetweenExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('columnUnsigned')
                 ->bigInteger(true))
-            ->where(1, 'between', [1, 2]);
+            ->where(3, 'not between', [1, 2]);
 
         $items = $adapter->query($query);
 

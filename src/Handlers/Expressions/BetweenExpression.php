@@ -7,7 +7,7 @@ namespace Fi1a\MySql\Handlers\Expressions;
 use Fi1a\DB\Exceptions\QueryErrorException;
 
 /**
- * Условие "между"
+ * Условие "BETWEEN"
  */
 class BetweenExpression extends AbstractExpression
 {
