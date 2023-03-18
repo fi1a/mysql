@@ -11,9 +11,9 @@ use Fi1a\DB\Queries\ColumnType;
 use Fi1a\Unit\MySql\TestCases\TestCase;
 
 /**
- * Условие "like"
+ * Условие "not like"
  */
-class LikeExpressionTest extends TestCase
+class NotLikeExpressionTest extends TestCase
 {
     /**
      * Создание таблицы с типом
@@ -91,22 +91,11 @@ class LikeExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('column')
                 ->text())
-            ->where('column', 'like', '%bar%');
+            ->where('column', 'not like', '%bar%');
 
         $items = $adapter->query($query);
 
-        $this->assertCount(3, $items);
-        $this->assertEquals([
-            [
-                'column' => 'foo bar baz',
-            ],
-            [
-                'column' => 'foo bar qux',
-            ],
-            [
-                'column' => 'foo bar quz',
-            ],
-        ], $items);
+        $this->assertCount(0, $items);
     }
 
     /**
@@ -121,22 +110,11 @@ class LikeExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('column')
                 ->text(), 'alias')
-            ->where('alias', 'like', '%bar%');
+            ->where('alias', 'not like', '%bar%');
 
         $items = $adapter->query($query);
 
-        $this->assertCount(3, $items);
-        $this->assertEquals([
-            [
-                'alias' => 'foo bar baz',
-            ],
-            [
-                'alias' => 'foo bar qux',
-            ],
-            [
-                'alias' => 'foo bar quz',
-            ],
-        ], $items);
+        $this->assertCount(0, $items);
     }
 
     /**
@@ -151,22 +129,11 @@ class LikeExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('column')
                 ->text())
-            ->where('foo bar baz', 'like', '%bar%');
+            ->where('foo bar baz', 'not like', '%bar%');
 
         $items = $adapter->query($query);
 
-        $this->assertCount(3, $items);
-        $this->assertEquals([
-            [
-                'column' => 'foo bar baz',
-            ],
-            [
-                'column' => 'foo bar qux',
-            ],
-            [
-                'column' => 'foo bar quz',
-            ],
-        ], $items);
+        $this->assertCount(0, $items);
     }
 
     /**
@@ -183,24 +150,13 @@ class LikeExpressionTest extends TestCase
                 ->text())
             ->where(
                 ColumnType::create()->name('column'),
-                'like',
+                'not like',
                 ColumnType::create()->name('column')
             );
 
         $items = $adapter->query($query);
 
-        $this->assertCount(3, $items);
-        $this->assertEquals([
-            [
-                'column' => 'foo bar baz',
-            ],
-            [
-                'column' => 'foo bar qux',
-            ],
-            [
-                'column' => 'foo bar quz',
-            ],
-        ], $items);
+        $this->assertCount(0, $items);
     }
 
     /**

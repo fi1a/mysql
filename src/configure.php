@@ -37,6 +37,7 @@ use Fi1a\MySql\Handlers\Expressions\LikeExpression;
 use Fi1a\MySql\Handlers\Expressions\LtExpression;
 use Fi1a\MySql\Handlers\Expressions\LteExpression;
 use Fi1a\MySql\Handlers\Expressions\NotEqExpression;
+use Fi1a\MySql\Handlers\Expressions\NotLikeExpression;
 use Fi1a\MySql\Handlers\Expressions\Registry as ExpRegistry;
 use Fi1a\MySql\Handlers\Expressions\RegistryInterface as ExpRegistryInterface;
 
@@ -103,3 +104,4 @@ ExpressionRegistry::add('<=', LteExpression::class);
 ExpressionRegistry::add('is', IsExpression::class);
 ExpressionRegistry::add('is not', IsNotExpression::class);
 ExpressionRegistry::add('like', LikeExpression::class);
+ExpressionRegistry::add('not like', NotLikeExpression::class);

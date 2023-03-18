@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Fi1a\MySql\Handlers\Expressions;
 
 /**
- * Условие "like"
+ * Условие "not like"
  */
-class LikeExpression extends AbstractExpression
+class NotLikeExpression extends AbstractExpression
 {
     /**
      * @inheritDoc
      */
     protected function getExpressionSignSql(): string
     {
-        return 'LIKE';
+        return 'NOT LIKE';
     }
 }
