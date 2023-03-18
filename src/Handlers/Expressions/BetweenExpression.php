@@ -17,7 +17,7 @@ class BetweenExpression extends AbstractExpression
     protected function getSecondPartSql(): string
     {
         if (!is_array($this->value) || isset($this->value['columnName']) || count($this->value) !== 2) {
-            throw new QueryErrorException('Ошибка в формате значения between');
+            throw new QueryErrorException('Ошибка в формате значения');
         }
         $values = array_values($this->value);
 
