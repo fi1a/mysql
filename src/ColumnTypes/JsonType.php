@@ -24,6 +24,10 @@ class JsonType extends AbstractType
      */
     public function conversionTo($value): string
     {
+        if ($value === null) {
+            return 'NULL';
+        }
+
         return $this->connection->quote(json_encode($value, JSON_UNESCAPED_UNICODE));
     }
 

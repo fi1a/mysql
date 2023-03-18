@@ -131,6 +131,7 @@ class FloatTypeTest extends TestCase
         $this->assertEquals('100.02', $floatType->conversionTo(100.02));
         $this->assertEquals('100', $floatType->conversionTo('100'));
         $this->assertEquals('0', $floatType->conversionTo(0));
+        $this->assertEquals('NULL', $floatType->conversionTo(null));
     }
 
     /**

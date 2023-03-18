@@ -25,6 +25,10 @@ class CharType extends AbstractType
      */
     public function conversionTo($value): string
     {
+        if ($value === null) {
+            return 'NULL';
+        }
+
         $string = (string) $value;
         if (!($value instanceof SqlExpression)) {
             if (strlen($string) > $this->getLength()) {

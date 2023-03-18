@@ -131,6 +131,7 @@ class DecimalTypeTest extends TestCase
         $this->assertEquals('100', $decimalType->conversionTo(100));
         $this->assertEquals('100', $decimalType->conversionTo('100'));
         $this->assertEquals('0', $decimalType->conversionTo(0));
+        $this->assertEquals('NULL', $decimalType->conversionTo(null));
     }
 
     /**

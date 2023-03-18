@@ -116,6 +116,7 @@ class TimeTypeTest extends TestCase
     {
         $timeType = new TimeType($this->getAdapter()->getConnection(), 'columnName');
         $this->assertEquals('\'01:00:00\'', $timeType->conversionTo('01:00:00'));
+        $this->assertEquals('NULL', $timeType->conversionTo(null));
     }
 
     /**

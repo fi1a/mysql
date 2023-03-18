@@ -155,6 +155,7 @@ class StringTypeTest extends TestCase
     {
         $stringType = new StringType($this->getAdapter()->getConnection(), 'columnName');
         $this->assertEquals('\'text\'', $stringType->conversionTo('text'));
+        $this->assertEquals('NULL', $stringType->conversionTo(null));
     }
 
     /**

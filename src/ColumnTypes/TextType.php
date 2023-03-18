@@ -24,6 +24,10 @@ class TextType extends AbstractType
      */
     public function conversionTo($value): string
     {
+        if ($value === null) {
+            return 'NULL';
+        }
+
         $string = (string) $value;
         if (!($value instanceof SqlExpression)) {
             $string = $this->connection->quote($string);

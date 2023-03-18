@@ -136,6 +136,7 @@ class EnumTypeTest extends TestCase
     {
         $enumType = new EnumType($this->getAdapter()->getConnection(), 'columnName');
         $this->assertEquals('\'red\'', $enumType->conversionTo('red'));
+        $this->assertEquals('NULL', $enumType->conversionTo(null));
     }
 
     /**

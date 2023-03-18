@@ -22,6 +22,10 @@ class IntegerType extends AbstractType
      */
     public function conversionTo($value): string
     {
+        if ($value === null) {
+            return 'NULL';
+        }
+
         return $value === 0 ? '0' : (string) $value;
     }
 

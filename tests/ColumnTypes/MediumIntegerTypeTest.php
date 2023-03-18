@@ -131,6 +131,7 @@ class MediumIntegerTypeTest extends TestCase
         $this->assertEquals('100', $mediumIntegerType->conversionTo(100));
         $this->assertEquals('100', $mediumIntegerType->conversionTo('100'));
         $this->assertEquals('0', $mediumIntegerType->conversionTo(0));
+        $this->assertEquals('NULL', $mediumIntegerType->conversionTo(null));
     }
 
     /**

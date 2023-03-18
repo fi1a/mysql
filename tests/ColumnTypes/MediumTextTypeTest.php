@@ -101,6 +101,7 @@ class MediumTextTypeTest extends TestCase
     {
         $mediumTextType = new MediumTextType($this->getAdapter()->getConnection(), 'columnName');
         $this->assertEquals('\'text\'', $mediumTextType->conversionTo('text'));
+        $this->assertEquals('NULL', $mediumTextType->conversionTo(null));
     }
 
     /**

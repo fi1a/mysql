@@ -131,6 +131,7 @@ class IntegerTypeTest extends TestCase
         $this->assertEquals('100', $integerType->conversionTo(100));
         $this->assertEquals('100', $integerType->conversionTo('100'));
         $this->assertEquals('0', $integerType->conversionTo(0));
+        $this->assertEquals('NULL', $integerType->conversionTo(null));
     }
 
     /**

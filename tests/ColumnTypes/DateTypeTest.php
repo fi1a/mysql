@@ -116,6 +116,7 @@ class DateTypeTest extends TestCase
     {
         $dateType = new DateType($this->getAdapter()->getConnection(), 'columnName');
         $this->assertEquals('\'2023-03-07\'', $dateType->conversionTo('2023-03-07'));
+        $this->assertEquals('NULL', $dateType->conversionTo(null));
     }
 
     /**

@@ -131,6 +131,7 @@ class SmallIntegerTypeTest extends TestCase
         $this->assertEquals('100', $smallIntegerType->conversionTo(100));
         $this->assertEquals('100', $smallIntegerType->conversionTo('100'));
         $this->assertEquals('0', $smallIntegerType->conversionTo(0));
+        $this->assertEquals('NULL', $smallIntegerType->conversionTo(null));
     }
 
     /**

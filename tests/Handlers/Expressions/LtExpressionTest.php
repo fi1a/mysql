@@ -108,7 +108,7 @@ class LtExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testExpression(): void
     {
@@ -132,7 +132,7 @@ class LtExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testAliasExpression(): void
     {
@@ -156,7 +156,7 @@ class LtExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testSecondColumnExpression(): void
     {
@@ -180,7 +180,7 @@ class LtExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testValueExpression(): void
     {
@@ -199,7 +199,7 @@ class LtExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testColumnExpression(): void
     {
@@ -225,7 +225,7 @@ class LtExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testNotColumnExpression(): void
     {

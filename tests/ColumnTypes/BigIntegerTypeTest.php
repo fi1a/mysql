@@ -193,6 +193,7 @@ class BigIntegerTypeTest extends TestCase
         $this->assertEquals('100', $bigIntegerType->conversionTo(100));
         $this->assertEquals('100', $bigIntegerType->conversionTo('100'));
         $this->assertEquals('0', $bigIntegerType->conversionTo(0));
+        $this->assertEquals('NULL', $bigIntegerType->conversionTo(null));
     }
 
     /**

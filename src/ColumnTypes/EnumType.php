@@ -34,6 +34,10 @@ class EnumType extends AbstractType
      */
     public function conversionTo($value): string
     {
+        if ($value === null) {
+            return 'NULL';
+        }
+
         return $this->connection->quote((string) $value);
     }
 

@@ -22,6 +22,10 @@ class BooleanType extends AbstractType
      */
     public function conversionTo($value): string
     {
+        if ($value === null) {
+            return 'NULL';
+        }
+
         return $value === true || $value === 1 || $value === '1' ? '1' : '0';
     }
 
