@@ -11,9 +11,9 @@ use Fi1a\DB\Queries\ColumnType;
 use Fi1a\Unit\MySql\TestCases\TestCase;
 
 /**
- * Условие "больше"
+ * Условие "больше или равнр"
  */
-class GtExpressionTest extends TestCase
+class GteExpressionTest extends TestCase
 {
     /**
      * Создание таблицы с типом
@@ -119,7 +119,7 @@ class GtExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('column')
                 ->bigInteger())
-            ->where('column', '>', 2);
+            ->where('column', '>=', 3);
 
         $items = $adapter->query($query);
 
@@ -143,7 +143,7 @@ class GtExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('column')
                 ->bigInteger(), 'alias')
-            ->where('alias', '>', 2);
+            ->where('alias', '>=', 3);
 
         $items = $adapter->query($query);
 
@@ -167,7 +167,7 @@ class GtExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('column')
                 ->bigInteger())
-            ->where(2, '>', ColumnType::create()->name('column')->integer());
+            ->where(1, '>=', ColumnType::create()->name('column')->integer());
 
         $items = $adapter->query($query);
 
@@ -191,7 +191,7 @@ class GtExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('columnUnsigned')
                 ->bigInteger(true))
-            ->where(2, '>', 1);
+            ->where(2, '>=', 1);
 
         $items = $adapter->query($query);
 
@@ -226,13 +226,27 @@ class GtExpressionTest extends TestCase
                 ->bigInteger(true))
             ->where(
                 ColumnType::create()->name('column'),
-                '>',
+                '>=',
                 ColumnType::create()->name('columnUnsigned')
             );
 
         $items = $adapter->query($query);
 
-        $this->assertCount(0, $items);
+        $this->assertCount(3, $items);
+        $this->assertEquals([
+            [
+                'column' => 1,
+                'columnUnsigned' => 1,
+            ],
+            [
+                'column' => 2,
+                'columnUnsigned' => 2,
+            ],
+            [
+                'column' => 3,
+                'columnUnsigned' => 3,
+            ],
+        ], $items);
     }
 
     /**
@@ -250,7 +264,7 @@ class GtExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('columnUnsigned')
                 ->bigInteger(true))
-            ->where('foo', '>', 'bar');
+            ->where('foo', '>=', 'bar');
 
         $items = $adapter->query($query);
 
