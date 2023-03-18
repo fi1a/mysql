@@ -29,6 +29,7 @@ use Fi1a\MySql\ColumnTypes\TinyIntegerType;
 use Fi1a\MySql\Facades\ColumnTypeRegistry;
 use Fi1a\MySql\Facades\ExpressionRegistry;
 use Fi1a\MySql\Handlers\Expressions\EqExpression;
+use Fi1a\MySql\Handlers\Expressions\NotEqExpression;
 use Fi1a\MySql\Handlers\Expressions\Registry as ExpRegistry;
 use Fi1a\MySql\Handlers\Expressions\RegistryInterface as ExpRegistryInterface;
 
@@ -87,3 +88,4 @@ ColumnTypeRegistry::add('json', JsonType::class);
 ColumnTypeRegistry::add('enum', EnumType::class);
 
 ExpressionRegistry::add('=', EqExpression::class);
+ExpressionRegistry::add('<>', NotEqExpression::class);

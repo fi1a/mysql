@@ -2,20 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Fi1a\Unit\MySql\ColumnTypes;
+namespace Fi1a\Unit\MySql\Handlers\Expressions;
 
 use Fi1a\DB\Facades\Query;
 use Fi1a\DB\Facades\Schema;
-use Fi1a\DB\Queries\AndWhere;
 use Fi1a\DB\Queries\Column;
 use Fi1a\DB\Queries\ColumnType;
-use Fi1a\MySql\ColumnTypes\BigIntegerType;
 use Fi1a\Unit\MySql\TestCases\TestCase;
 
 /**
- * BigInteger
+ * Условие "не равно"
  */
-class BigIntegerTypeTest extends TestCase
+class NotEqExpressionTest extends TestCase
 {
     /**
      * Создание таблицы с типом
@@ -110,22 +108,19 @@ class BigIntegerTypeTest extends TestCase
     }
 
     /**
-     * Запрс выборки
+     * Условие равно
      */
-    public function testSelectWhereLine(): void
+    public function testExpression(): void
     {
         $adapter = $this->getAdapter();
 
         $query = Query::select()
-            ->from('tableName')
-            ->column(ColumnType::create()
-                ->name('columnUnsigned')
-                ->bigInteger(true))
+            ->from('tableName', 'tableAlias')
             ->column(ColumnType::create()
                 ->name('column')
                 ->bigInteger())
-            ->where('column', '=', 1)
-            ->andWhere('columnUnsigned', '=', 1);
+            ->where('column', '<>', 2)
+            ->andWhere('column', '<>', 3);
 
         $items = $adapter->query($query);
 
@@ -133,15 +128,64 @@ class BigIntegerTypeTest extends TestCase
         $this->assertEquals([
             [
                 'column' => 1,
-                'columnUnsigned' => 1,
             ],
         ], $items);
     }
 
     /**
-     * Запрс выборки
+     * Условие равно
      */
-    public function testSelectWhereNested(): void
+    public function testAliasExpression(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName')
+            ->column(ColumnType::create()
+                ->name('column')
+                ->bigInteger(), 'alias')
+            ->where('alias', '<>', 2)
+            ->andWhere('alias', '<>', 3);
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(1, $items);
+        $this->assertEquals([
+            [
+                'alias' => 1,
+            ],
+        ], $items);
+    }
+
+    /**
+     * Условие равно
+     */
+    public function testSecondColumnExpression(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName', 'tableAlias')
+            ->column(ColumnType::create()
+                ->name('column')
+                ->bigInteger())
+            ->where(2, '<>', ColumnType::create()->name('column')->integer())
+            ->andWhere(3, '<>', ColumnType::create()->name('column')->integer());
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(1, $items);
+        $this->assertEquals([
+            [
+                'column' => 1,
+            ],
+        ], $items);
+    }
+
+    /**
+     * Условие равно
+     */
+    public function testValueExpression(): void
     {
         $adapter = $this->getAdapter();
 
@@ -150,21 +194,83 @@ class BigIntegerTypeTest extends TestCase
             ->column(ColumnType::create()
                 ->name('columnUnsigned')
                 ->bigInteger(true))
-            ->where('column', '=', 1)
-            ->orWhere(
-                AndWhere::create('columnUnsigned', '=', 1)
-                ->orWhere('columnUnsigned', '=', 2)
-            );
+            ->where(2, '<>', 1)
+            ->andWhere(3, '<>', 1);
 
         $items = $adapter->query($query);
 
-        $this->assertCount(2, $items);
+        $this->assertCount(3, $items);
         $this->assertEquals([
             [
                 'columnUnsigned' => 1,
             ],
             [
                 'columnUnsigned' => 2,
+            ],
+            [
+                'columnUnsigned' => 3,
+            ],
+        ], $items);
+    }
+
+    /**
+     * Условие равно
+     */
+    public function testColumnExpression(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName', 'tableAlias')
+            ->column(ColumnType::create()
+                ->name('column')
+                ->bigInteger())
+            ->column(ColumnType::create()
+                ->name('columnUnsigned')
+                ->bigInteger(true))
+            ->where(
+                ColumnType::create()->name('column'),
+                '<>',
+                ColumnType::create()->name('columnUnsigned')
+            );
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(0, $items);
+    }
+
+    /**
+     * Условие равно
+     */
+    public function testNotColumnExpression(): void
+    {
+        $adapter = $this->getAdapter();
+
+        $query = Query::select()
+            ->from('tableName', 'tableAlias')
+            ->column(ColumnType::create()
+                ->name('column')
+                ->bigInteger())
+            ->column(ColumnType::create()
+                ->name('columnUnsigned')
+                ->bigInteger(true))
+            ->where('foo', '<>', 'bar');
+
+        $items = $adapter->query($query);
+
+        $this->assertCount(3, $items);
+        $this->assertEquals([
+            [
+                'column' => 1,
+                'columnUnsigned' => 1,
+            ],
+            [
+                'column' => 2,
+                'columnUnsigned' => 2,
+            ],
+            [
+                'column' => 3,
+                'columnUnsigned' => 3,
             ],
         ], $items);
     }
@@ -182,26 +288,5 @@ class BigIntegerTypeTest extends TestCase
             ->name('tableName');
 
         $this->assertTrue($adapter->exec($query));
-    }
-
-    /**
-     * Приведение типа значения к записи в БД
-     */
-    public function testConversionTo(): void
-    {
-        $bigIntegerType = new BigIntegerType($this->getAdapter()->getConnection(), 'columnName');
-        $this->assertEquals('100', $bigIntegerType->conversionTo(100));
-        $this->assertEquals('100', $bigIntegerType->conversionTo('100'));
-        $this->assertEquals('0', $bigIntegerType->conversionTo(0));
-    }
-
-    /**
-     * Приведение типа значения из БД
-     */
-    public function testConversionFrom(): void
-    {
-        $bigIntegerType = new BigIntegerType($this->getAdapter()->getConnection(), 'columnName');
-        $this->assertEquals(100, $bigIntegerType->conversionFrom('100'));
-        $this->assertEquals(0, $bigIntegerType->conversionFrom('0'));
     }
 }

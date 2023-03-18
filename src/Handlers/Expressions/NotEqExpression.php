@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Fi1a\MySql\Handlers\Expressions;
 
 /**
- * Условие "равно"
+ * Условие "не равно"
  */
-class EqExpression extends AbstractExpression
+class NotEqExpression extends AbstractExpression
 {
     /**
      * @inheritDoc
      */
     protected function getExpressionSignSql(): string
     {
-        return '=';
+        return '<>';
     }
 }
