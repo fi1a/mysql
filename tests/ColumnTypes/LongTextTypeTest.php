@@ -101,6 +101,7 @@ class LongTextTypeTest extends TestCase
     {
         $longTextType = new LongTextType($this->getAdapter()->getConnection(), 'columnName');
         $this->assertEquals('\'text\'', $longTextType->conversionTo('text'));
+        $this->assertEquals('NULL', $longTextType->conversionTo(null));
     }
 
     /**

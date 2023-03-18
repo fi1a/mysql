@@ -130,6 +130,7 @@ class DoubleTypeTest extends TestCase
         $this->assertEquals('100.02', $doubleType->conversionTo(100.02));
         $this->assertEquals('100', $doubleType->conversionTo('100'));
         $this->assertEquals('0', $doubleType->conversionTo(0));
+        $this->assertEquals('NULL', $doubleType->conversionTo(null));
     }
 
     /**

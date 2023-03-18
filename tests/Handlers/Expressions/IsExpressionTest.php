@@ -11,9 +11,9 @@ use Fi1a\DB\Queries\ColumnType;
 use Fi1a\Unit\MySql\TestCases\TestCase;
 
 /**
- * Условие "меньше или равно"
+ * Условие "является ли значение null или boolean"
  */
-class LteExpressionTest extends TestCase
+class IsExpressionTest extends TestCase
 {
     /**
      * Создание таблицы с типом
@@ -117,16 +117,22 @@ class LteExpressionTest extends TestCase
         $query = Query::select()
             ->from('tableName', 'tableAlias')
             ->column(ColumnType::create()
-                ->name('column')
+                ->name('columnNull')
                 ->bigInteger())
-            ->where('column', '<=', 1);
+            ->where('columnNull', 'is', null);
 
         $items = $adapter->query($query);
 
-        $this->assertCount(1, $items);
+        $this->assertCount(3, $items);
         $this->assertEquals([
             [
-                'column' => 1,
+                'columnNull' => null,
+            ],
+            [
+                'columnNull' => null,
+            ],
+            [
+                'columnNull' => null,
             ],
         ], $items);
     }
@@ -141,43 +147,22 @@ class LteExpressionTest extends TestCase
         $query = Query::select()
             ->from('tableName')
             ->column(ColumnType::create()
-                ->name('column')
+                ->name('columnNull')
                 ->bigInteger(), 'alias')
-            ->where('alias', '<=', 1);
+            ->where('alias', 'is', null);
 
         $items = $adapter->query($query);
 
-        $this->assertCount(1, $items);
+        $this->assertCount(3, $items);
         $this->assertEquals([
             [
-                'alias' => 1,
-            ],
-        ], $items);
-    }
-
-    /**
-     * Условие
-     */
-    public function testSecondColumnExpression(): void
-    {
-        $adapter = $this->getAdapter();
-
-        $query = Query::select()
-            ->from('tableName', 'tableAlias')
-            ->column(ColumnType::create()
-                ->name('column')
-                ->bigInteger())
-            ->where(2, '<=', ColumnType::create()->name('column')->integer());
-
-        $items = $adapter->query($query);
-
-        $this->assertCount(2, $items);
-        $this->assertEquals([
-            [
-                'column' => 2,
+                'alias' => null,
             ],
             [
-                'column' => 3,
+                'alias' => null,
+            ],
+            [
+                'alias' => null,
             ],
         ], $items);
     }
@@ -194,69 +179,7 @@ class LteExpressionTest extends TestCase
             ->column(ColumnType::create()
                 ->name('columnUnsigned')
                 ->bigInteger(true))
-            ->where(2, '<=', 1);
-
-        $items = $adapter->query($query);
-
-        $this->assertCount(0, $items);
-    }
-
-    /**
-     * Условие
-     */
-    public function testColumnExpression(): void
-    {
-        $adapter = $this->getAdapter();
-
-        $query = Query::select()
-            ->from('tableName', 'tableAlias')
-            ->column(ColumnType::create()
-                ->name('column')
-                ->bigInteger())
-            ->column(ColumnType::create()
-                ->name('columnUnsigned')
-                ->bigInteger(true))
-            ->where(
-                ColumnType::create()->name('column'),
-                '<=',
-                ColumnType::create()->name('columnUnsigned')
-            );
-
-        $items = $adapter->query($query);
-
-        $this->assertCount(3, $items);
-        $this->assertEquals([
-            [
-                'column' => 1,
-                'columnUnsigned' => 1,
-            ],
-            [
-                'column' => 2,
-                'columnUnsigned' => 2,
-            ],
-            [
-                'column' => 3,
-                'columnUnsigned' => 3,
-            ],
-        ], $items);
-    }
-
-    /**
-     * Условие
-     */
-    public function testNotColumnExpression(): void
-    {
-        $adapter = $this->getAdapter();
-
-        $query = Query::select()
-            ->from('tableName', 'tableAlias')
-            ->column(ColumnType::create()
-                ->name('column')
-                ->bigInteger())
-            ->column(ColumnType::create()
-                ->name('columnUnsigned')
-                ->bigInteger(true))
-            ->where('foo', '<=', 'bar');
+            ->where(1, 'is', null);
 
         $items = $adapter->query($query);
 

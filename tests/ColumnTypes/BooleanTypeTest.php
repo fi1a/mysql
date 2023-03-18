@@ -122,6 +122,7 @@ class BooleanTypeTest extends TestCase
         $this->assertEquals('1', $booleanType->conversionTo('1'));
         $this->assertEquals('0', $booleanType->conversionTo('0'));
         $this->assertEquals('0', $booleanType->conversionTo('value'));
+        $this->assertEquals('NULL', $booleanType->conversionTo(null));
     }
 
     /**

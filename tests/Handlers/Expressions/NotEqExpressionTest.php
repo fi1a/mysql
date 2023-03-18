@@ -108,7 +108,7 @@ class NotEqExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testExpression(): void
     {
@@ -133,7 +133,7 @@ class NotEqExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testAliasExpression(): void
     {
@@ -158,7 +158,7 @@ class NotEqExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testSecondColumnExpression(): void
     {
@@ -183,7 +183,7 @@ class NotEqExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testValueExpression(): void
     {
@@ -214,7 +214,7 @@ class NotEqExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testColumnExpression(): void
     {
@@ -240,7 +240,7 @@ class NotEqExpressionTest extends TestCase
     }
 
     /**
-     * Условие равно
+     * Условие
      */
     public function testNotColumnExpression(): void
     {

@@ -155,6 +155,7 @@ class CharTypeTest extends TestCase
     {
         $charType = new CharType($this->getAdapter()->getConnection(), 'columnName');
         $this->assertEquals('\'text\'', $charType->conversionTo('text'));
+        $this->assertEquals('NULL', $charType->conversionTo(null));
     }
 
     /**

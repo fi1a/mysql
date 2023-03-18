@@ -101,6 +101,7 @@ class JsonTypeTest extends TestCase
     {
         $jsonType = new JsonType($this->getAdapter()->getConnection(), 'columnName');
         $this->assertEquals('\'[1,2,3]\'', $jsonType->conversionTo([1, 2, 3]));
+        $this->assertEquals('NULL', $jsonType->conversionTo(null));
     }
 
     /**

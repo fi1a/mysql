@@ -101,6 +101,7 @@ class TextTypeTest extends TestCase
     {
         $textType = new TextType($this->getAdapter()->getConnection(), 'columnName');
         $this->assertEquals('\'text\'', $textType->conversionTo('text'));
+        $this->assertEquals('NULL', $textType->conversionTo(null));
     }
 
     /**

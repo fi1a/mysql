@@ -66,7 +66,7 @@ abstract class AbstractExpression implements ExpressionInterface
             $sql .= $this->type->conversionTo($this->column);
         }
 
-        $sql .= $this->getExpressionSignSql();
+        $sql .= ' ' . $this->getExpressionSignSql() . ' ';
 
         if (
             is_array($this->value)

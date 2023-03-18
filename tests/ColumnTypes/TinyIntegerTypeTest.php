@@ -131,6 +131,7 @@ class TinyIntegerTypeTest extends TestCase
         $this->assertEquals('100', $tinyIntegerType->conversionTo(100));
         $this->assertEquals('100', $tinyIntegerType->conversionTo('100'));
         $this->assertEquals('0', $tinyIntegerType->conversionTo(0));
+        $this->assertEquals('NULL', $tinyIntegerType->conversionTo(null));
     }
 
     /**

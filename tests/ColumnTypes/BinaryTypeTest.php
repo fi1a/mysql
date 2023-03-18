@@ -101,6 +101,7 @@ class BinaryTypeTest extends TestCase
     {
         $binaryType = new BinaryType($this->getAdapter()->getConnection(), 'columnName');
         $this->assertEquals('\'text\'', $binaryType->conversionTo('text'));
+        $this->assertEquals('NULL', $binaryType->conversionTo(null));
     }
 
     /**
