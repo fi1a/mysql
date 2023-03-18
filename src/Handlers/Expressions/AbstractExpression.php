@@ -33,6 +33,11 @@ abstract class AbstractExpression implements ExpressionInterface
     protected $naming;
 
     /**
+     * Возвращает часть sql для значка выражения
+     */
+    abstract protected function getExpressionSignSql(): string;
+
+    /**
      * @param mixed $column
      * @param mixed $value
      */
@@ -42,5 +47,38 @@ abstract class AbstractExpression implements ExpressionInterface
         $this->value = $value;
         $this->type = $type;
         $this->naming = $naming;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSql(): string
+    {
+        $sql = '';
+        if (
+            is_array($this->column)
+            && isset($this->column['columnName'])
+            && is_string($this->column['columnName'])
+            && $this->column['columnName'] !== ''
+        ) {
+            $sql .= $this->naming->wrapColumnName($this->column['columnName']);
+        } else {
+            $sql .= $this->type->conversionTo($this->column);
+        }
+
+        $sql .= $this->getExpressionSignSql();
+
+        if (
+            is_array($this->value)
+            && isset($this->value['columnName'])
+            && is_string($this->value['columnName'])
+            && $this->value['columnName'] !== ''
+        ) {
+            $sql .= $this->naming->wrapColumnName($this->value['columnName']);
+        } else {
+            $sql .= $this->type->conversionTo($this->value);
+        }
+
+        return $sql;
     }
 }
